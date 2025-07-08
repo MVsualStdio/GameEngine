@@ -1,4 +1,4 @@
-#include "D3D11Window.hpp"
+#include "D3D11Window.h"
 
 D3D11Window::D3D11Window()
 {
@@ -6,19 +6,17 @@ D3D11Window::D3D11Window()
     uint32_t _width = this->width();
     uint32_t _height = this->height();
     HWND windowHandle = reinterpret_cast<HWND>(this->winId());
-    m_Context = new D3D11Context(windowHandle, _width, _height);
-    m_Context->SetClearColor(1.0f, 0.0f,0.0f, 1.0f);
+    m_manger.init(windowHandle, _width, _height);
 }
 
 D3D11Window::~D3D11Window()
 {
-    delete m_Context;
+    
 }
 
 void D3D11Window::paintEvent(QPaintEvent *event)
 {
-    m_Context->ClearTarget();
-    m_Context->Present();
+    m_manger.present(1.0);
     update();
 }
 

@@ -1,5 +1,4 @@
-#ifndef D3D11_CONTEXT_HPP
-#define D3D11_CONTEXT_HPP
+#pragma once
 
 #include <cstdint>
 
@@ -15,18 +14,13 @@ public:
     D3D11Context(HWND windowHandle, uint32_t width, uint32_t height);
     virtual ~D3D11Context();
 
-    void ClearTarget();
-    void SetClearColor(float r, float g, float b, float a);
-    void ReceiveCommands();
-    void DispatchCommands();
-    void Draw(uint32_t elements);
-    void NewFrame();
-    void EndFrame();
     void Present();
-
+    void SetClearColor(float r, float g, float b, float a);
     virtual void OnResize(uint32_t width, uint32_t height);
 
-    // virtual std::any GetImGUIData() override;
+    ComPtr<ID3D11RenderTargetView> getScreenRT();
+    void setOMScreenRT();
+    void ClearScreenRT();
 private:
     void CreateDeviceAndSwapchain(HWND windowHandle, uint32_t width, uint32_t height);
     void CreateAdapter();
@@ -35,16 +29,15 @@ private:
 
     float m_ClearColor[4];
 
-    ComPtr<ID3D11Device> m_Device;
-    ComPtr<ID3D11DeviceContext> m_DeviceContext;
     ComPtr<IDXGISwapChain> m_SwapChain;
     ComPtr<IDXGIAdapter1> m_Adapter;
     ComPtr<ID3D11RenderTargetView> m_RenderTargetView;
 
     D3D11_VIEWPORT m_Viewport;
     D3D11_RECT m_ScissorRect;
+public:
+    ComPtr<ID3D11Device> m_Device;
+    ComPtr<ID3D11DeviceContext> m_DeviceContext;
 };
 
 
-
-#endif //D3D11_CONTEXT_HPP

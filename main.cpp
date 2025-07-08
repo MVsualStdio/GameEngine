@@ -1,4 +1,4 @@
-#include "D3D11Window.hpp"
+#include "D3D11Window.h"
 #include <QtWidgets/QApplication>
 
 int main(int argc, char *argv[]) {

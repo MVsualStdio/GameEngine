@@ -1,9 +1,9 @@
-#ifndef D3D11_WINDOW_H
-#define D3D11_WINDOW_H
+#pragma once
 
 #include <QtWidgets/QWidget>
 
-#include "D3D11Context.hpp"
+#include "D3D11Context.h"
+#include "DrawManger.h"
 
 // Create a QWindow subclass
 class D3D11Window : public QWidget {
@@ -17,8 +17,7 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
     QPaintEngine* paintEngine() const;
 private:
-    D3D11Context* m_Context;
+    DrawMangerBase m_manger;
 };
 
-#endif // OPENGLWINDOW_H
 

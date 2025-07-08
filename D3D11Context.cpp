@@ -1,4 +1,4 @@
-#include "D3D11Context.hpp"
+#include "D3D11Context.h"
 #include <cassert>
 
 D3D11Context::D3D11Context(HWND windowHandle, uint32_t width, uint32_t height)
@@ -31,7 +31,7 @@ void D3D11Context::OnResize(uint32_t width, uint32_t height)
     CreateViewport(width, height);
 }
 
-void D3D11Context::ClearTarget()
+void D3D11Context::ClearScreenRT()
 {
     m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), m_ClearColor);
 }
@@ -42,26 +42,6 @@ void D3D11Context::SetClearColor(float r, float g, float b, float a)
     m_ClearColor[1] = g;
     m_ClearColor[2] = b;
     m_ClearColor[3] = a;
-}
-
-void D3D11Context::ReceiveCommands()
-{
-}
-
-void D3D11Context::DispatchCommands()
-{
-}
-
-void D3D11Context::Draw(uint32_t elements)
-{
-}
-
-void D3D11Context::NewFrame()
-{
-}
-
-void D3D11Context::EndFrame()
-{
 }
 
 void D3D11Context::CreateDeviceAndSwapchain(HWND windowHandle, uint32_t width, uint32_t height)
@@ -131,7 +111,6 @@ void D3D11Context::CreateRenderTarget()
     HRESULT hr = m_Device->CreateRenderTargetView(pBackBuffer, NULL, m_RenderTargetView.GetAddressOf());
     assert(hr == S_OK);
     pBackBuffer->Release();
-    m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), NULL);
 }
 
 void D3D11Context::CreateViewport(uint32_t width, uint32_t height)
@@ -143,4 +122,12 @@ void D3D11Context::CreateViewport(uint32_t width, uint32_t height)
     m_Viewport.MinDepth = .0f;
     m_Viewport.MaxDepth = 1.0f;
     m_DeviceContext->RSSetViewports(1, &m_Viewport);
+}
+
+ComPtr<ID3D11RenderTargetView> D3D11Context::getScreenRT() {
+    return m_RenderTargetView;
+}
+
+void D3D11Context::setOMScreenRT() {
+    m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), NULL);
 }

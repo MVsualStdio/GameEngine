@@ -15,8 +15,11 @@ find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets)
 
 add_executable(d3d11window
     main.cpp
-    D3D11Window.cpp D3D11Window.hpp
-    D3D11Context.cpp D3D11Context.hpp
+    D3D11Window.h D3D11Window.cpp
+    D3D11Context.h D3D11Context.cpp
+    DrawManger.h  DrawManger.cpp
+    IDrawer.h IDrawer.cpp
+    DrawScreen.h DrawScreen.cpp
 )
 
 
