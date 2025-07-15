@@ -6,17 +6,18 @@ D3D11Window::D3D11Window()
     uint32_t _width = this->width();
     uint32_t _height = this->height();
     HWND windowHandle = reinterpret_cast<HWND>(this->winId());
-    m_manger.init(windowHandle, _width, _height);
+    m_manger = new DrawMangerBaseTrangle();
+    m_manger->init(windowHandle, _width, _height);
 }
 
 D3D11Window::~D3D11Window()
 {
-    
+    delete m_manger;
 }
 
 void D3D11Window::paintEvent(QPaintEvent *event)
 {
-    m_manger.present(1.0);
+    m_manger->present(1.0);
     //update();
 }
 

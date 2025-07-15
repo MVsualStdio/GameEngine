@@ -22,23 +22,23 @@ void DrawMangerBase::init(HWND winID, uint32_t width, uint32_t height) {
 	initMeshRender();
 }
 
-void DrawMangerBase::initDrawer() {
-	DrawScreen* drawScreen = new DrawScreen();
-	drawScreen->init(m_context.get());
-	m_drawList.push_back(drawScreen);
-}
-
 void DrawMangerBase::initMeshRender() {
 	for (auto draw : m_drawList) {
 		initMeshRenderItem(draw);
 	}
 }
 
-void DrawMangerBase::initMeshRenderItem(IDrawer* draw) {
-	MeshRender* meshRender = new MeshRender(draw, m_context.get());
+void DrawMangerBaseTrangle::initDrawer() {
+	DrawScreen* drawScreen = new DrawScreen();
+	drawScreen->init(m_context.get());
+	m_drawList.push_back(drawScreen);
+}
+
+void DrawMangerBaseTrangle::initMeshRenderItem(IDrawer* draw) {
+	std::unique_ptr<MeshRender> meshRender = std::make_unique<MeshRender>(draw, m_context.get());
 	Material* material = new Material(m_context.get());
 	material->setVSShader(L"E:/LearnSomething/RTTR/HLSL/baseVS.hlsli");
 	material->setPSShader(L"E:/LearnSomething/RTTR/HLSL/basePS.hlsli");
-	meshRender->setMaterial(material);
-	draw->addItem(meshRender);
+	meshRender->setMaterial(std::shared_ptr<Material>(material));
+	draw->addItem(std::move(meshRender));
 }

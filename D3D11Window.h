@@ -17,7 +17,7 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
     QPaintEngine* paintEngine() const;
 private:
-    DrawMangerBase m_manger;
+    DrawMangerBase* m_manger;
 };
 
 

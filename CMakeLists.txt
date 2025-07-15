@@ -15,7 +15,7 @@ find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets)
 find_package(Eigen3 REQUIRED)
 find_package(rttr REQUIRED)
 
-add_executable(d3d11window
+add_executable(engineMain
     main.cpp
     D3D11Window.h D3D11Window.cpp
     D3D11Context.h D3D11Context.cpp
@@ -36,7 +36,7 @@ add_executable(d3d11window
 #     MACOSX_BUNDLE TRUE
 # )
 
-target_link_libraries(d3d11window 
+target_link_libraries(engineMain 
     Qt5::Core
     Qt5::Gui
     Qt5::Widgets

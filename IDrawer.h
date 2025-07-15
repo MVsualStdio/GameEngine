@@ -4,6 +4,7 @@
 #include <vector>
 #include "Texture.h"
 #include "Eigen/Core"
+#include <memory>
 
 class IRenderObject {
 public:
@@ -14,11 +15,11 @@ class IDrawer {
 public:
 	virtual void present(double dt) = 0;
 	virtual void init(D3D11Context* context);
-	void addItem(IRenderObject* item);
+	void addItem(std::unique_ptr<IRenderObject> item);
 	void renderForeach();
 	virtual ComPtr<ID3D11RenderTargetView> getRenderTarget() = 0;
 protected:
-	std::vector<IRenderObject*> m_items;
+	std::vector<std::unique_ptr<IRenderObject>> m_items;
 	D3D11Context* m_context = nullptr;
 };
 

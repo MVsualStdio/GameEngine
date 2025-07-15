@@ -15,12 +15,13 @@ public:
 	void setWorld(const Eigen::Matrix4f world);
 	void setView(const Eigen::Matrix4f view);
 	void setProjection(const Eigen::Matrix4f projection);
-	void setMaterial(Material* material);
+	void setMaterial(std::shared_ptr<Material> material);
 private:
 	D3D11Context* m_context;
-	Material* m_material;
 	IDrawer* m_drawer;
+
 	std::shared_ptr<Pipeline> m_pipeline;
+	std::shared_ptr<Material> m_material;
 
 	Eigen::Matrix4f m_world;
 	Eigen::Matrix4f m_view;
