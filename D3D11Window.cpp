@@ -17,7 +17,7 @@ D3D11Window::~D3D11Window()
 void D3D11Window::paintEvent(QPaintEvent *event)
 {
     m_manger.present(1.0);
-    update();
+    //update();
 }
 
 void D3D11Window::resizeEvent(QResizeEvent *event)

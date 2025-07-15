@@ -3,10 +3,10 @@
 
 D3D11Context::D3D11Context(HWND windowHandle, uint32_t width, uint32_t height)
 {
-    m_ClearColor[0] = .6f;
-    m_ClearColor[1] = 1.0f;
-    m_ClearColor[2] = .3f;
-    m_ClearColor[3] = 1.0f;
+    m_ClearColor[0] = 0.0f;
+    m_ClearColor[1] = 0.0f;
+    m_ClearColor[2] = 0.0f;
+    m_ClearColor[3] = 0.0f;
 
     CreateDeviceAndSwapchain(windowHandle,width,height);
     CreateAdapter();

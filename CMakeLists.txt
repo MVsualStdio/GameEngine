@@ -3,7 +3,7 @@
 
 cmake_minimum_required(VERSION 3.10)
 
-project(qt_d3d11_window LANGUAGES CXX)
+project(engine LANGUAGES CXX)
 
 include(E:/LearnSomething/vcpkg/scripts/buildsystems/vcpkg.cmake)
 
@@ -12,6 +12,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets)
+find_package(Eigen3 REQUIRED)
+find_package(rttr REQUIRED)
 
 add_executable(d3d11window
     main.cpp
@@ -20,6 +22,11 @@ add_executable(d3d11window
     DrawManger.h  DrawManger.cpp
     IDrawer.h IDrawer.cpp
     DrawScreen.h DrawScreen.cpp
+    MeshRender.h MeshRender.cpp
+    Pipeline.h Pipeline.cpp
+    Texture.h Texture.cpp
+    Material.h Material.cpp
+    HLSL/baseVS.hlsli HLSL/basePS.hlsli 
 )
 
 
@@ -33,5 +40,9 @@ target_link_libraries(d3d11window
     Qt5::Core
     Qt5::Gui
     Qt5::Widgets
-    d3d11.lib dxgi.lib dxguid.lib D3DCompiler.lib winmm.lib)
 
+    RTTR::Core
+
+    Eigen3::Eigen
+
+    d3d11.lib dxgi.lib dxguid.lib D3DCompiler.lib winmm.lib)

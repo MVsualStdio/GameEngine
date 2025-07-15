@@ -4,7 +4,7 @@ void IDrawer::init(D3D11Context* context) {
 	m_context = context;
 }
 
-void IDrawer::addItem(IObject* item) {
+void IDrawer::addItem(IRenderObject* item) {
 	m_items.push_back(item);
 }
 

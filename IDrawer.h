@@ -2,8 +2,10 @@
 
 #include "D3D11Context.h"
 #include <vector>
+#include "Texture.h"
+#include "Eigen/Core"
 
-class IObject {
+class IRenderObject {
 public:
 	virtual void render() = 0;
 };
@@ -12,10 +14,37 @@ class IDrawer {
 public:
 	virtual void present(double dt) = 0;
 	virtual void init(D3D11Context* context);
-	void addItem(IObject* item);
+	void addItem(IRenderObject* item);
 	void renderForeach();
+	virtual ComPtr<ID3D11RenderTargetView> getRenderTarget() = 0;
 protected:
-	std::vector<IObject*> m_items;
+	std::vector<IRenderObject*> m_items;
 	D3D11Context* m_context = nullptr;
 };
 
+struct VertexUV {
+	Eigen::Vector3<float> pos;
+	Eigen::Vector3<float> normal;
+	Eigen::Vector2<float> uv;
+	Eigen::Vector4<float> color;
+};
+
+struct VertexUVData {
+	std::vector<VertexUV> data;
+	std::vector<uint32_t> index;
+	size_t dataSize() {
+		return data.size() * sizeof(VertexUV);
+	}
+	size_t itemSize() {
+		return sizeof(VertexUV);
+	}
+	VertexUV* ptrData() {
+		return data.data();
+	}
+	size_t indexSize() {
+		return index.size() * sizeof(uint32_t);
+	}
+	uint32_t* ptrIndex() {
+		return index.data();
+	}
+};

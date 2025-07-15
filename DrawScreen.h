@@ -7,6 +7,6 @@ class DrawScreen : public IDrawer {
 public:
 	void present(double dt) override;
 	void init(D3D11Context* context) override;
-
+	ComPtr<ID3D11RenderTargetView> getRenderTarget() override;
 };
 
