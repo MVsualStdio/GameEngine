@@ -34,7 +34,8 @@ Pipeline::Pipeline(D3D11Context* context, Material* material, IDrawer* drawer)
 	vertex.index = { 0,1,2 };
 	
 	m_context->m_Device->CreateInputLayout(inputLayout, ARRAYSIZE(inputLayout),
-		material->getVSBlob()->GetBufferPointer(), material->getVSBlob()->GetBufferSize(), &pInputLayout);
+		material->getVSShader()->getBlob()->GetBufferPointer(), 
+		material->getVSShader()->getBlob()->GetBufferSize(), &pInputLayout);
 
 	CD3D11_BUFFER_DESC bufferDesc(0,
 		D3D11_BIND_VERTEX_BUFFER,
@@ -62,7 +63,13 @@ void Pipeline::IA() {
 }
 
 void Pipeline::VS() {
-	m_context->m_DeviceContext->VSSetShader(m_material->getVSShader(), 0, 0);
+	m_context->m_DeviceContext->VSSetShader(m_material->getVSShader()->getVS().Get(), 0, 0);
+	Material::CBuffers buffers = m_material->getVSShader()->getUniform();
+	for (auto buffer : buffers) {
+		CBufferData bufferData = buffer.second;
+		bufferData.UpdateBuffer(m_context->m_DeviceContext.Get());
+		m_context->m_DeviceContext->VSSetConstantBuffers(bufferData.getSlot(), 1, bufferData.getBuffer().GetAddressOf());
+	}
 }
 
 void Pipeline::Rasterizer() {
@@ -70,7 +77,13 @@ void Pipeline::Rasterizer() {
 }
 
 void Pipeline::PS() {
-	m_context->m_DeviceContext->PSSetShader(m_material->getPSShader(), 0, 0);
+	m_context->m_DeviceContext->PSSetShader(m_material->getPSShader()->getPS().Get(), 0, 0);
+	Material::CBuffers buffers = m_material->getPSShader()->getUniform();
+	for (auto buffer : buffers) {
+		CBufferData bufferData = buffer.second;
+		bufferData.UpdateBuffer(m_context->m_DeviceContext.Get());
+		m_context->m_DeviceContext->PSSetConstantBuffers(bufferData.getSlot(), 1, bufferData.getBuffer().GetAddressOf());
+	}
 }
 
 void Pipeline::OM() {

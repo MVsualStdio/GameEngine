@@ -5,6 +5,7 @@
 #include "Texture.h"
 #include "Eigen/Core"
 #include <memory>
+#include <variant>
 
 class IRenderObject {
 public:
@@ -49,3 +50,11 @@ struct VertexUVData {
 		return index.data();
 	}
 };
+
+inline size_t StringToID(std::string_view str)
+{
+	static std::hash<std::string_view> hash;
+	return hash(str);
+}
+//, Eigen::Matrix4f
+using Property = std::variant<int, uint32_t, float, Eigen::Matrix4f>;

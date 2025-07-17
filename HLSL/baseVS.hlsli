@@ -1,3 +1,11 @@
+
+cbuffer ConstantBuffer : register(b0)
+{
+    matrix g_World; 
+    matrix g_View;  
+    matrix g_Proj; 
+}
+
 struct VertexIn
 {
     float3 pos : POSITION;
@@ -16,6 +24,8 @@ VertexOut VS(VertexIn vIn)
 {
     VertexOut vOut;
     vOut.color = vIn.color;
-    vOut.posH = float4(vIn.pos,1.0);
+    vOut.posH = mul(float4(vIn.pos,1.0), g_World);
+    vOut.posH = mul(vOut.posH, g_View);
+    vOut.posH = mul(vOut.posH, g_Proj);
     return vOut;
 }

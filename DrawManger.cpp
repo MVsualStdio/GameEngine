@@ -39,6 +39,10 @@ void DrawMangerBaseTrangle::initMeshRenderItem(IDrawer* draw) {
 	Material* material = new Material(m_context.get());
 	material->setVSShader(L"E:/LearnSomething/RTTR/HLSL/baseVS.hlsli");
 	material->setPSShader(L"E:/LearnSomething/RTTR/HLSL/basePS.hlsli");
+
+	material->getVSShader()->setUniform("g_World", Eigen::Matrix4f::Identity());
+	material->getVSShader()->setUniform("g_View", Eigen::Matrix4f::Identity());
+	material->getVSShader()->setUniform("g_Proj", Eigen::Matrix4f::Identity());
 	meshRender->setMaterial(std::shared_ptr<Material>(material));
 	draw->addItem(std::move(meshRender));
 }

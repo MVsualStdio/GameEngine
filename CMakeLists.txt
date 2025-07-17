@@ -3,8 +3,8 @@
 
 cmake_minimum_required(VERSION 3.10)
 
-project(engine LANGUAGES CXX)
-
+project(engine)
+set(CMAKE_CXX_STANDARD 17)
 include(E:/LearnSomething/vcpkg/scripts/buildsystems/vcpkg.cmake)
 
 set(CMAKE_AUTOUIC ON)
@@ -19,14 +19,16 @@ add_executable(engineMain
     main.cpp
     D3D11Window.h D3D11Window.cpp
     D3D11Context.h D3D11Context.cpp
-    DrawManger.h  DrawManger.cpp
+    DrawManger.h DrawManger.cpp
     IDrawer.h IDrawer.cpp
     DrawScreen.h DrawScreen.cpp
     MeshRender.h MeshRender.cpp
     Pipeline.h Pipeline.cpp
     Texture.h Texture.cpp
     Material.h Material.cpp
-    HLSL/baseVS.hlsli HLSL/basePS.hlsli 
+    CBuffer.h CBuffer.cpp
+    Shader.h Shader.cpp
+    HLSL/baseVS.hlsli HLSL/basePS.hlsli
 )
 
 
