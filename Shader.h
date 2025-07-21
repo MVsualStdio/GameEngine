@@ -9,19 +9,25 @@ class IShader {
 public:
 	using CBuffers = std::unordered_map<uint32_t, CBufferData>;
 	using CBufferVariables = std::unordered_map<size_t, std::shared_ptr<ConstantBufferVariable>>;
+	using TextureBuffer = std::unordered_map<uint32_t, ShaderResource>;
+	using SampleBuffer = std::unordered_map<uint32_t, SamplerState>;
 public:
 	IShader(D3D11Context* context, LPCWSTR filename, LPCSTR entry, LPCSTR entryTarget);
 	void setUniform(std::string name, Property value);
+	void setTexture(size_t slot, Texture2D value);
 	CBuffers getUniform();
+	TextureBuffer getTexture();
+	SampleBuffer getSample();
 	ID3DBlob* getBlob();
 protected:
-	HRESULT shaderReflection(ID3DBlob* blob, CBuffers& ConstantBuffers, CBufferVariables& ConstantBufferVariables);
+	HRESULT shaderReflection(ID3DBlob* blob, CBuffers& ConstantBuffers, CBufferVariables& ConstantBufferVariables, TextureBuffer& TextureBuffer, SampleBuffer& SampleBuffer);
 protected:
 	D3D11Context* m_context;
 	CBuffers m_CBuffers;
 	CBufferVariables m_ConstantBufferVariables;
 	ComPtr<ID3DBlob> m_blob;
-
+	TextureBuffer m_TextureBuffer;
+	SampleBuffer m_SampleBuffer;
 };
 
 class VSShader : public IShader {

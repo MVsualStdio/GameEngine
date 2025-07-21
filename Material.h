@@ -10,10 +10,6 @@
 
 class Material {
 public:
-	using CBuffers = std::unordered_map<uint32_t, CBufferData>;
-	using CBufferVariables = std::unordered_map<size_t, std::shared_ptr<ConstantBufferVariable>>;
-
-public:
 	Material(D3D11Context* context);
 	~Material();
 	void addTexture(std::string name, Texture2D texture);

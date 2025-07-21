@@ -4,6 +4,7 @@
 
 class Texture2DBase {
 public:
+	Texture2DBase(D3D11Context* context, ComPtr<ID3D11ShaderResourceView> pTextureSRV);
 	Texture2DBase(D3D11Context* context, const CD3D11_TEXTURE2D_DESC& texDesc, const CD3D11_SHADER_RESOURCE_VIEW_DESC& srvDesc);
 	virtual ~Texture2DBase() = default;
 	ID3D11Texture2D* GetTexture() { return m_pTexture.Get(); }
@@ -20,6 +21,7 @@ protected:
 
 class Texture2D : public Texture2DBase {
 public:
+	Texture2D(D3D11Context* context, ComPtr<ID3D11ShaderResourceView> pTextureSRV);
 	Texture2D(D3D11Context* device, uint32_t width, uint32_t height, 
 		DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM,
 		uint32_t mipLevels = 1,

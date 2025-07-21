@@ -25,4 +25,5 @@ private:
 	std::vector<uint32_t> offsets;
 	uint32_t indexCount = 0;
 	ID3D11InputLayout* pInputLayout = nullptr;
+	ComPtr<ID3D11SamplerState> pSampleState = nullptr;
 };

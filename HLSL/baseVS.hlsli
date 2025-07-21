@@ -18,6 +18,7 @@ struct VertexOut
 {
     float4 posH : SV_POSITION;
     float4 color : COLOR;
+    float2 tex : TEXCOORD;
 };
 
 VertexOut VS(VertexIn vIn)
@@ -27,5 +28,6 @@ VertexOut VS(VertexIn vIn)
     vOut.posH = mul(float4(vIn.pos,1.0), g_World);
     vOut.posH = mul(vOut.posH, g_View);
     vOut.posH = mul(vOut.posH, g_Proj);
+    vOut.tex = vIn.tex;
     return vOut;
 }

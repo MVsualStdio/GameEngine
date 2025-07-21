@@ -10,7 +10,6 @@ Pipeline::Pipeline(D3D11Context* context, Material* material, IDrawer* drawer)
 		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		
 	};
 
 	vertex.data.resize(3);
@@ -22,9 +21,9 @@ Pipeline::Pipeline(D3D11Context* context, Material* material, IDrawer* drawer)
 	vertex.data[1].color = Eigen::Vector4<float>(0.0f, 0.0f, 1.0f, 1.0f);
 	vertex.data[2].color = Eigen::Vector4<float>(1.0f, 0.0f, 0.0f, 1.0f);
 
-	vertex.data[0].uv = Eigen::Vector2<float>(0.0f, 0.0f);
-	vertex.data[1].uv = Eigen::Vector2<float>(0.0f, 0.0f);
-	vertex.data[2].uv = Eigen::Vector2<float>(0.0f, 0.0f);
+	vertex.data[0].uv = Eigen::Vector2<float>(1.0f, 0.0f);
+	vertex.data[1].uv = Eigen::Vector2<float>(0.0f, 1.0f);
+	vertex.data[2].uv = Eigen::Vector2<float>(1.0f, 1.0f);
 		
 	vertex.data[0].normal = Eigen::Vector3<float>(0.0f, 0.0f, 0.0f);
 	vertex.data[1].normal = Eigen::Vector3<float>(0.0f, 0.0f, 0.0f);
@@ -51,6 +50,17 @@ Pipeline::Pipeline(D3D11Context* context, Material* material, IDrawer* drawer)
 	bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	initData.pSysMem = vertex.ptrIndex();
 	m_context->m_Device->CreateBuffer(&bufferDesc, &initData, pIndexBuffer.GetAddressOf());
+
+	D3D11_SAMPLER_DESC sampDesc;
+	ZeroMemory(&sampDesc, sizeof(sampDesc));
+	sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	sampDesc.MinLOD = 0;
+	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	m_context->m_Device->CreateSamplerState(&sampDesc, pSampleState.GetAddressOf());
 }
 
 void Pipeline::IA() {
@@ -64,7 +74,7 @@ void Pipeline::IA() {
 
 void Pipeline::VS() {
 	m_context->m_DeviceContext->VSSetShader(m_material->getVSShader()->getVS().Get(), 0, 0);
-	Material::CBuffers buffers = m_material->getVSShader()->getUniform();
+	IShader::CBuffers buffers = m_material->getVSShader()->getUniform();
 	for (auto buffer : buffers) {
 		CBufferData bufferData = buffer.second;
 		bufferData.UpdateBuffer(m_context->m_DeviceContext.Get());
@@ -78,12 +88,21 @@ void Pipeline::Rasterizer() {
 
 void Pipeline::PS() {
 	m_context->m_DeviceContext->PSSetShader(m_material->getPSShader()->getPS().Get(), 0, 0);
-	Material::CBuffers buffers = m_material->getPSShader()->getUniform();
+	IShader::CBuffers buffers = m_material->getPSShader()->getUniform();
 	for (auto buffer : buffers) {
 		CBufferData bufferData = buffer.second;
 		bufferData.UpdateBuffer(m_context->m_DeviceContext.Get());
 		m_context->m_DeviceContext->PSSetConstantBuffers(bufferData.getSlot(), 1, bufferData.getBuffer().GetAddressOf());
 	}
+	IShader::TextureBuffer textures = m_material->getPSShader()->getTexture();
+	for (auto texture : textures) {
+		m_context->m_DeviceContext->PSSetShaderResources(texture.first, 1, texture.second.pSRV.GetAddressOf());
+	}
+	IShader::SampleBuffer samples = m_material->getPSShader()->getSample();
+	for (auto sample : samples) {
+		m_context->m_DeviceContext->PSSetSamplers(sample.first, 1, pSampleState.GetAddressOf());
+	}
+
 }
 
 void Pipeline::OM() {

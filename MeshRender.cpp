@@ -20,18 +20,6 @@ void MeshRender::render() {
 	m_pipeline->DrawIndex();
 }
 
-void MeshRender::setWorld(const Eigen::Matrix4f world) {
-	m_world = world;
-}
-
-void MeshRender::setView(const Eigen::Matrix4f view) {
-	m_view = view;
-}
-
-void MeshRender::setProjection(const Eigen::Matrix4f projection) {
-	m_projection = projection;
-}
-
 void MeshRender::setMaterial(std::shared_ptr<Material> material) {
 	m_material = material;
 }

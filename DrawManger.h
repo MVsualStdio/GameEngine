@@ -14,14 +14,17 @@ public:
 	void initMeshRender();
 protected:
 	virtual void initDrawer() = 0;
-	virtual void initMeshRenderItem(IDrawer* draw) = 0;
 protected:
 	std::vector<IDrawer*> m_drawList;
 	std::shared_ptr<D3D11Context> m_context;
 };
 
-class DrawMangerBaseTrangle : public DrawMangerBase {
+
+class DrawMangerTexture : public DrawMangerBase {
 private:
 	virtual void initDrawer();
-	virtual void initMeshRenderItem(IDrawer* draw);
+private:
+	void initDrawScreen(IDrawer* draw);
+	void initDrawTexture(IDrawer* draw);
+	Texture2D* texture;
 };

@@ -13,3 +13,11 @@ void IDrawer::renderForeach() {
 		(*item)->render();
 	}
 }
+
+void IDrawer::initDrawFunction(DrawFunction op) {
+	m_op = op;
+}
+
+void IDrawer::initRender() {
+	m_op(this);
+}

@@ -6,7 +6,7 @@
 #include "Eigen/Core"
 #include <memory>
 #include <variant>
-
+#include <functional>
 class IRenderObject {
 public:
 	virtual void render() = 0;
@@ -14,14 +14,18 @@ public:
 
 class IDrawer {
 public:
+	using DrawFunction = std::function<void(IDrawer* draw)>;
 	virtual void present(double dt) = 0;
 	virtual void init(D3D11Context* context);
 	void addItem(std::unique_ptr<IRenderObject> item);
 	void renderForeach();
 	virtual ComPtr<ID3D11RenderTargetView> getRenderTarget() = 0;
+	void initDrawFunction(DrawFunction op);
+	void initRender();
 protected:
 	std::vector<std::unique_ptr<IRenderObject>> m_items;
 	D3D11Context* m_context = nullptr;
+	DrawFunction m_op;
 };
 
 struct VertexUV {

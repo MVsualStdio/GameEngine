@@ -28,6 +28,7 @@ add_executable(engineMain
     Material.h Material.cpp
     CBuffer.h CBuffer.cpp
     Shader.h Shader.cpp
+    DDSTextureLoader11.h DDSTextureLoader11.cpp
     HLSL/baseVS.hlsli HLSL/basePS.hlsli
 )
 

@@ -17,6 +17,21 @@ Texture2DBase::Texture2DBase(D3D11Context* context, const CD3D11_TEXTURE2D_DESC&
 	}
 }
 
+Texture2DBase::Texture2DBase(D3D11Context* context, ComPtr<ID3D11ShaderResourceView> pTextureSRV)
+	: m_pTextureSRV(pTextureSRV)
+	, m_context(context) {
+
+	ID3D11Resource* pResource;
+	m_pTextureSRV->GetResource(&pResource);  // 获取绑定的资源
+
+	if (SUCCEEDED(pResource->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&m_pTexture))) {
+		D3D11_TEXTURE2D_DESC desc;
+		m_pTexture->GetDesc(&desc);
+
+		m_width = desc.Width;
+		m_height = desc.Height;
+	}
+}
 
 
 Texture2D::Texture2D(D3D11Context* context, uint32_t width, uint32_t height, 
@@ -34,3 +49,7 @@ Texture2D::Texture2D(D3D11Context* context, uint32_t width, uint32_t height,
 
 }
 
+Texture2D::Texture2D(D3D11Context* context, ComPtr<ID3D11ShaderResourceView> pTextureSRV)
+	:Texture2DBase(context, pTextureSRV) {
+
+}

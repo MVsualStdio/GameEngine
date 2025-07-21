@@ -31,6 +31,18 @@ private:
 	uint32_t startSlot = 0;
 };
 
+struct ShaderResource
+{
+	std::string name;
+	D3D11_SRV_DIMENSION dim;
+	ComPtr<ID3D11ShaderResourceView> pSRV;
+};
+
+struct SamplerState {
+	std::string name;
+	ComPtr<ID3D11SamplerState> pSS;
+};
+
 class ConstantBufferVariable {
 private:
 	void SetFloatMatrix(uint32_t rows, uint32_t cols, const float* noPadData);

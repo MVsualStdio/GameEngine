@@ -3,6 +3,8 @@
 
 D3D11Context::D3D11Context(HWND windowHandle, uint32_t width, uint32_t height)
 {
+    m_width = width;
+    m_height = height;
     m_ClearColor[0] = 0.0f;
     m_ClearColor[1] = 0.0f;
     m_ClearColor[2] = 0.0f;
@@ -31,9 +33,19 @@ void D3D11Context::OnResize(uint32_t width, uint32_t height)
     CreateViewport(width, height);
 }
 
+void D3D11Context::ClearRT(ID3D11RenderTargetView* pRenderTargetView) {
+    m_DeviceContext->ClearRenderTargetView(pRenderTargetView, m_ClearColor);
+}
+
+void D3D11Context::resetRT() {
+    ID3D11RenderTargetView* output = nullptr;
+    m_DeviceContext->OMSetRenderTargets(0, &output, nullptr);
+}
+
+
 void D3D11Context::ClearScreenRT()
 {
-    m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), m_ClearColor);
+    ClearRT(m_RenderTargetView.Get());
 }
 
 void D3D11Context::SetClearColor(float r, float g, float b, float a)
