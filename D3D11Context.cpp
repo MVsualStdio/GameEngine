@@ -25,6 +25,11 @@ void D3D11Context::Present()
     m_SwapChain->Present(0, 0);
 }
 
+float D3D11Context::AspectRatio()const
+{
+    return static_cast<float>(m_width) / m_height;
+}
+
 void D3D11Context::OnResize(uint32_t width, uint32_t height)
 {
     m_RenderTargetView.Reset();

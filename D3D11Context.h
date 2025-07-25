@@ -25,6 +25,7 @@ public:
     void resetRT();
     uint32_t width() { return m_width; }
     uint32_t height() { return m_height; }
+    float AspectRatio()const;
 private:
     void CreateDeviceAndSwapchain(HWND windowHandle, uint32_t width, uint32_t height);
     void CreateAdapter();

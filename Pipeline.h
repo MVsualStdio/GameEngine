@@ -6,7 +6,7 @@
 
 class Pipeline {
 public:
-	Pipeline(D3D11Context* context, Material* material, IDrawer* drawer);
+	Pipeline(D3D11Context* context, Material* material, VertexUVData* vertex, IDrawer* drawer);
 	virtual void IA();
 	virtual void VS();
 	virtual void Rasterizer();
@@ -17,8 +17,8 @@ private:
 	D3D11Context* m_context;
 	Material* m_material;
 	IDrawer* m_drawer;
+	VertexUVData* m_vertex;
 
-	VertexUVData vertex;
 	ComPtr<ID3D11Buffer> pVertexBuffers = nullptr;
 	ComPtr<ID3D11Buffer> pIndexBuffer = nullptr;
 	std::vector<uint32_t> strides;

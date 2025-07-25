@@ -28,6 +28,10 @@ add_executable(engineMain
     Material.h Material.cpp
     CBuffer.h CBuffer.cpp
     Shader.h Shader.cpp
+    MeshFilter.h MeshFilter.cpp
+    Scene.h Scene.cpp
+    Vertex.h
+    Camera.h Camera.cpp
     DDSTextureLoader11.h DDSTextureLoader11.cpp
     HLSL/baseVS.hlsli HLSL/basePS.hlsli
 )

@@ -4,7 +4,7 @@
 void DrawScreen::present(double dt) {
 	m_context->resetRT();
 	m_context->ClearScreenRT();
-	renderForeach();
+	renderForeach(dt);
 	m_context->Present();
 }
 
@@ -25,7 +25,7 @@ DrawTexture::DrawTexture(Texture2D* texture)
 void DrawTexture::present(double dt) {
 	m_context->resetRT();
 	m_context->ClearRT(m_texture->GetRenderTarget());
-	renderForeach();
+	renderForeach(dt);
 }
 
 void DrawTexture::init(D3D11Context* context) {

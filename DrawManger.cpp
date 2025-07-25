@@ -2,13 +2,16 @@
 #include "DrawScreen.h"
 #include "MeshRender.h"
 #include "DDSTextureLoader11.h"
+#include "MeshFilter.h"
 
-DrawMangerBase::DrawMangerBase() {
-
+DrawMangerBase::DrawMangerBase()
+	: m_mainCameraIndex(-1) {
 }
 
 DrawMangerBase::~DrawMangerBase() {
-	
+	for (IDrawer* drawer : m_drawList) {
+		delete drawer;
+	}
 }
 
 void DrawMangerBase::present(double dt) {
@@ -19,6 +22,7 @@ void DrawMangerBase::present(double dt) {
 
 void DrawMangerBase::init(HWND winID, uint32_t width, uint32_t height) {
 	m_context = std::make_shared<D3D11Context>(winID, width, height);
+	initCompent();
 	initDrawer();
 	initMeshRender();
 }
@@ -29,57 +33,31 @@ void DrawMangerBase::initMeshRender() {
 	}
 }
 
-
-void DrawMangerTexture::initDrawScreen(IDrawer* draw) {
-	std::unique_ptr<MeshRender> meshRender = std::make_unique<MeshRender>(draw, m_context.get());
-	Material* material = new Material(m_context.get());
-	material->setVSShader(L"E:/LearnSomething/RTTR/HLSL/baseVS.hlsli");
-	material->setPSShader(L"E:/LearnSomething/RTTR/HLSL/basePS.hlsli");
-
-	material->getVSShader()->setUniform("g_World", Eigen::Matrix4f::Identity());
-	material->getVSShader()->setUniform("g_View", Eigen::Matrix4f::Identity());
-	material->getVSShader()->setUniform("g_Proj", Eigen::Matrix4f::Identity());
-
-	material->getPSShader()->setTexture(0, *texture);
-
-	meshRender->setMaterial(std::shared_ptr<Material>(material));
-	draw->addItem(std::move(meshRender));
+void DrawMangerBase::addMainCamera(int index, std::shared_ptr<ICamera> camera) {
+	addOtherCamera(index, camera);
+	m_mainCameraIndex = index;
+}
+void DrawMangerBase::addOtherCamera(int index, std::shared_ptr<ICamera> camera) {
+	if (m_cameraList.find(index) == m_cameraList.end()) {
+		m_cameraList.emplace(std::pair{ index,camera });
+	}
+	else {
+		m_cameraList[index] = camera;
+	}
 }
 
-void DrawMangerTexture::initDrawTexture(IDrawer* draw) {
-	std::unique_ptr<MeshRender> meshRender = std::make_unique<MeshRender>(draw, m_context.get());
-	Material* material = new Material(m_context.get());
-	material->setVSShader(L"E:/LearnSomething/RTTR/HLSL/baseVS.hlsli");
-	material->setPSShader(L"E:/LearnSomething/RTTR/HLSL/basePS.hlsli");
-
-	material->getVSShader()->setUniform("g_World", Eigen::Matrix4f::Identity());
-	material->getVSShader()->setUniform("g_View", Eigen::Matrix4f::Identity());
-	material->getVSShader()->setUniform("g_Proj", Eigen::Matrix4f::Identity());
-
-	ID3D11ShaderResourceView* textureView;
-	DirectX::CreateDDSTextureFromFile(m_context->m_Device.Get(), L"E:/LearnSomething/RTTR/HLSL/flare.dds", nullptr, &textureView);
-	Texture2D textureDDS(m_context.get(), textureView);
-	material->getPSShader()->setTexture(0, textureDDS);
-	
-	meshRender->setMaterial(std::shared_ptr<Material>(material));
-	draw->addItem(std::move(meshRender));
+void DrawMangerBase::setMainCamera(int index) {
+	if (m_cameraList.find(index) != m_cameraList.end()) {
+		m_mainCameraIndex = index;
+	}
+}
+ICamera* DrawMangerBase::getCamera(int index) {
+	if (m_cameraList.find(index) != m_cameraList.end()) {
+		return m_cameraList[index].get();
+	}
+	return nullptr;
 }
 
-void DrawMangerTexture::initDrawer() {
-	texture = new Texture2D(m_context.get(), m_context->width(), m_context->height());
-	DrawTexture* drawTexture = new DrawTexture(texture);
-	drawTexture->init(m_context.get());
-	drawTexture->initDrawFunction([this](IDrawer* draw) {
-		initDrawTexture(draw);
-	});
-	m_drawList.push_back(drawTexture);
-
-
-	DrawScreen* drawScreen = new DrawScreen();
-	drawScreen->init(m_context.get());
-	drawScreen->initDrawFunction([this](IDrawer* draw) {
-		initDrawScreen(draw);
-	});
-	m_drawList.push_back(drawScreen);
-
+ICamera* DrawMangerBase::getMainCamera() {
+	return getCamera(m_mainCameraIndex);
 }
