@@ -20,6 +20,7 @@ inline size_t StringToID(std::string_view str)
 class IRenderObject {
 public:
 	virtual void render(double dt) = 0;
+	virtual void updateCamera() = 0;
 };
 
 class IDrawer {
@@ -32,18 +33,17 @@ public:
 	virtual ComPtr<ID3D11RenderTargetView> getRenderTarget() = 0;
 	void initDrawFunction(DrawFunction op);
 	void initRender();
+	void updateCamera();
 protected:
 	std::vector<std::shared_ptr<IRenderObject>> m_items;
 	D3D11Context* m_context = nullptr;
 	DrawFunction m_op;
 };
 
-class IGameObject {
+class IAnim {
 public:
-	IGameObject();
 	virtual void tick(double dt) = 0;
-protected:
-
+	virtual void cameraChange() = 0;
 };
 
 

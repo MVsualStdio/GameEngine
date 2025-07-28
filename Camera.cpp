@@ -32,7 +32,7 @@ Eigen::Matrix4f ProjectionCamera::projection() {
 void ProjectionCamera::updateViewMatrix()
 {
     if (m_viewDirty) {
-        // Ê¹ÓÃlookAtº¯Êý´´½¨ÊÓÍ¼¾ØÕó
+        // Ê¹ï¿½ï¿½lookAtï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½
         m_view = Eigen::Matrix4f::Identity();
 
         Eigen::Vector3f f = m_front;
@@ -87,7 +87,12 @@ void ProjectionCamera::copy(Eigen::Matrix4f& mat, DirectX::XMMATRIX& dxMat) {
     DirectX::XMStoreFloat4x4(&dxFloat4x4, dxMat);
     for (int i = 0; i < 4; ++i) {
         for (int j = 0; j < 4; ++j) {
-            mat(i, j) = dxFloat4x4.m[i][j]; // Ö±½Ó¿½±´£¨×Ô¶¯×ªÖÃ£©
+            mat(i, j) = dxFloat4x4.m[i][j];
         }
     }
+}
+
+void ProjectionCamera::move(const Eigen::Vector3f& offset) {
+    m_position += offset;
+    m_viewDirty = true;
 }

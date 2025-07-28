@@ -8,6 +8,7 @@ public:
 	ICamera() = default;
 	virtual Eigen::Matrix4f view() = 0;
 	virtual Eigen::Matrix4f projection() = 0;
+	virtual void move(const Eigen::Vector3f& offset) = 0;
 };
 
 class ProjectionCamera : public ICamera {
@@ -19,6 +20,8 @@ public:
 	Eigen::Matrix4f projection() override;
 	void updateViewMatrix();
 	void updateProjectionMatrix();
+	void move(const Eigen::Vector3f& offset);
+
 private:
 	float m_fov;
 	float m_aspectRatio;

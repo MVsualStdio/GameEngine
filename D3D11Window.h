@@ -17,6 +17,7 @@ protected:
     void paintEvent(QPaintEvent* event) override;
     void resizeEvent(QResizeEvent *event) override;
     QPaintEngine* paintEngine() const;
+    void keyPressEvent(QKeyEvent* event);
 private:
     DrawMangerBase* m_manger;
     std::chrono::steady_clock::time_point m_preTime;

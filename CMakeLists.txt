@@ -32,6 +32,8 @@ add_executable(engineMain
     Scene.h Scene.cpp
     Vertex.h
     Camera.h Camera.cpp
+    DrawScreenManager.h DrawScreenManager.cpp
+    GameObjBox.h GameObjBox.cpp
     DDSTextureLoader11.h DDSTextureLoader11.cpp
     HLSL/baseVS.hlsli HLSL/basePS.hlsli
 )

@@ -16,7 +16,6 @@ ComPtr<ID3D11RenderTargetView> DrawScreen::getRenderTarget() {
 	return m_context->getScreenRT();
 }
 
-
 DrawTexture::DrawTexture(Texture2D* texture)
 	: m_texture(texture) {
 

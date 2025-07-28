@@ -37,6 +37,7 @@ void DrawMangerBase::addMainCamera(int index, std::shared_ptr<ICamera> camera) {
 	addOtherCamera(index, camera);
 	m_mainCameraIndex = index;
 }
+
 void DrawMangerBase::addOtherCamera(int index, std::shared_ptr<ICamera> camera) {
 	if (m_cameraList.find(index) == m_cameraList.end()) {
 		m_cameraList.emplace(std::pair{ index,camera });
@@ -61,3 +62,15 @@ ICamera* DrawMangerBase::getCamera(int index) {
 ICamera* DrawMangerBase::getMainCamera() {
 	return getCamera(m_mainCameraIndex);
 }
+
+void DrawMangerBase::updateCamera() {
+	for (auto draw : m_drawList) {
+		draw->updateCamera();
+	}
+}
+
+void DrawMangerBase::moveMainCamera(float x, float y, float z) {
+	getMainCamera()->move(Eigen::Vector3f{ x,y,z });
+	updateCamera();
+}
+

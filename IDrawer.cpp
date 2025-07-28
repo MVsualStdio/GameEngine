@@ -22,8 +22,8 @@ void IDrawer::initRender() {
 	m_op(this);
 }
 
-
-IGameObject::IGameObject() {
-	
+void IDrawer::updateCamera() {
+	for (auto item = m_items.begin(); item != m_items.end(); ++item) {
+		(*item)->updateCamera();
+	}
 }
-
