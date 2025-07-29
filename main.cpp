@@ -1,7 +1,7 @@
-#include "D3D11Window.h"
+#include "Window/D3D11Window.h"
 #include <QtWidgets/QApplication>
-#include "Scene.h"
-#include "DrawScreenManager.h"
+#include "Core/Scene.h"
+#include "Shell/DrawScreenManager.h"
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);

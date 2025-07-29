@@ -1,9 +1,10 @@
-#include "GameObjBox.h"
-#include "DDSTextureLoader11.h"
-#include "MeshFilter.h"
+#include "WoodCrateBox.h"
+#include "../Core/DDSTextureLoader11.h"
+#include "../Core/MeshFilter.h"
 
-WoodCrateBox::WoodCrateBox(IDrawer* drawer, D3D11Context* context, ICamera* camera)
-	: MeshRender(drawer, context) {
+WoodCrateBox::WoodCrateBox(IDrawer* drawer, D3D11Context* context, ICamera* camera, Texture2D& texture)
+	: MeshRender(drawer, context)
+	, m_texture(texture){
 
 	setRenderCamera(camera);
 	ID3D11ShaderResourceView* textureView;
@@ -11,8 +12,8 @@ WoodCrateBox::WoodCrateBox(IDrawer* drawer, D3D11Context* context, ICamera* came
 	Texture2D textureDDS(context, textureView);
 
 	Material* material = new Material(context);
-	material->setVSShader(L"E:/LearnSomething/RTTR/HLSL/baseVS.hlsli");
-	material->setPSShader(L"E:/LearnSomething/RTTR/HLSL/basePS.hlsli");
+	material->setVSShader(L"E:/LearnSomething/RTTR/HLSL/woodCrateBox.hlsli");
+	material->setPSShader(L"E:/LearnSomething/RTTR/HLSL/woodCrateBox.hlsli");
 	Eigen::Matrix4f world = Eigen::Matrix4f::Identity();
 	//world(3, 2) = 30;
 	material->getVSShader()->setUniform("g_World", world);
@@ -20,6 +21,7 @@ WoodCrateBox::WoodCrateBox(IDrawer* drawer, D3D11Context* context, ICamera* came
 	material->getVSShader()->setUniform("g_Proj", camera->projection());
 
 	material->getPSShader()->setTexture(0, textureDDS);
+	material->getPSShader()->setTexture(1, m_texture);
 	this->setMaterial(std::shared_ptr<Material>(material));
 	this->setVertex(Geometry::CreateCube(10.0f, 10.0f, 10.0f));
 }

@@ -1,9 +1,8 @@
 #pragma once
 
 #include <QtWidgets/QWidget>
-
-#include "D3D11Context.h"
-#include "DrawManger.h"
+#include "../Core/D3D11Context.h"
+#include "../Core/DrawManger.h"
 #include <chrono>
 
 // Create a QWindow subclass

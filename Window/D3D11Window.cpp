@@ -1,7 +1,7 @@
 #include "D3D11Window.h"
 #include <iostream>
 #include <QKeyEvent>
-#include "DrawScreen.h"
+#include "../Core/DrawScreen.h"
 
 D3D11Window::D3D11Window(DrawMangerBase* manger)
     :m_manger(manger) {

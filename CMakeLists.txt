@@ -15,30 +15,50 @@ find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets)
 find_package(Eigen3 REQUIRED)
 find_package(rttr REQUIRED)
 
-add_executable(engineMain
-    main.cpp
-    D3D11Window.h D3D11Window.cpp
-    D3D11Context.h D3D11Context.cpp
-    DrawManger.h DrawManger.cpp
-    IDrawer.h IDrawer.cpp
-    DrawScreen.h DrawScreen.cpp
-    MeshRender.h MeshRender.cpp
-    Pipeline.h Pipeline.cpp
-    Texture.h Texture.cpp
-    Material.h Material.cpp
-    CBuffer.h CBuffer.cpp
-    Shader.h Shader.cpp
-    MeshFilter.h MeshFilter.cpp
-    Scene.h Scene.cpp
-    Vertex.h
-    Camera.h Camera.cpp
-    DrawScreenManager.h DrawScreenManager.cpp
-    GameObjBox.h GameObjBox.cpp
-    RenderPass.h RenderPass.cpp
-    DDSTextureLoader11.h DDSTextureLoader11.cpp
+set(CoreFiles     
+    Core/D3D11Context.h Core/D3D11Context.cpp
+    Core/DrawManger.h Core/DrawManger.cpp
+    Core/IDrawer.h Core/IDrawer.cpp
+    Core/DrawScreen.h Core/DrawScreen.cpp
+    Core/MeshRender.h Core/MeshRender.cpp
+    Core/Pipeline.h Core/Pipeline.cpp
+    Core/Texture.h Core/Texture.cpp
+    Core/Material.h Core/Material.cpp
+    Core/CBuffer.h Core/CBuffer.cpp
+    Core/Shader.h Core/Shader.cpp
+    Core/MeshFilter.h Core/MeshFilter.cpp
+    Core/Scene.h Core/Scene.cpp
+    Core/Vertex.h
+    Core/Camera.h Core/Camera.cpp
+    Core/DDSTextureLoader11.h Core/DDSTextureLoader11.cpp
+    Core/RenderPass.h Core/RenderPass.cpp
+)
+
+set(ShellFiles     
+    Shell/DrawScreenManager.h Shell/DrawScreenManager.cpp
+    Shell/WoodCrateBox.h Shell/WoodCrateBox.cpp
+)
+
+set(WindowFiles
+    Window/D3D11Window.h Window/D3D11Window.cpp
+)
+
+set(ResourceFiles
     HLSL/baseVS.hlsli HLSL/basePS.hlsli
 )
 
+source_group("Core Files" FILES ${CoreFiles})
+source_group("Shell Files" FILES  ${ShellFiles})
+source_group("Window Files" FILES ${WindowFiles})
+source_group("HLSL Files" FILES ${ResourceFiles})
+
+add_executable(engineMain
+    main.cpp
+    ${CoreFiles}
+    ${ShellFiles}
+    ${WindowFiles}
+    ${ResourceFiles}
+)
 
 
 # set_target_properties(d3d11window PROPERTIES

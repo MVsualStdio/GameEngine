@@ -9,13 +9,13 @@ void IDrawer::addItem(std::shared_ptr<IRenderObject> item) {
 }
 
 void IDrawer::renderForeach(double dt) {
-	for (auto item = m_items.begin(); item != m_items.end(); ++item) {
+	for (auto& item = m_items.begin(); item != m_items.end(); ++item) {
 		(*item)->render(dt);
 	}
 }
 
 void IDrawer::updateCamera(ICamera* camera) {
-	for (auto item = m_items.begin(); item != m_items.end(); ++item) {
+	for (auto& item = m_items.begin(); item != m_items.end(); ++item) {
 		(*item)->updateCamera(camera);
 	}
 }

@@ -20,17 +20,3 @@ private:
 	RenderItem m_renderItems;
 	IDrawer* m_drawer;
 };
-
-
-class DrawMangerTexture : public DrawMangerBase {
-public:
-	DrawMangerTexture();
-private:
-	void prepare() override;
-	void initCompent() override;
-private:
-	void initDrawScreen(IDrawer* draw);
-	void initDrawTexture(IDrawer* draw);
-	std::shared_ptr<Texture2D> texture;
-	double m_time = 0.0;
-};
