@@ -23,7 +23,7 @@ public:
 	ICamera* getRenderCamera() { return m_camera; }
 
 	void render(double dt) override;
-	void updateCamera() override;
+	void updateCamera(ICamera* camera) override;
 
 	void tick(double dt) override;
 	void cameraChange() override;

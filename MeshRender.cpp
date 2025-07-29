@@ -31,7 +31,8 @@ void MeshRender::render(double dt) {
 	m_pipeline->DrawIndex();
 }
 
-void MeshRender::updateCamera() {
+void MeshRender::updateCamera(ICamera* camera) {
+	setRenderCamera(camera);
 	m_cameraUpdate(this);
 }
 

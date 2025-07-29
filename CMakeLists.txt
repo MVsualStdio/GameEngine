@@ -34,6 +34,7 @@ add_executable(engineMain
     Camera.h Camera.cpp
     DrawScreenManager.h DrawScreenManager.cpp
     GameObjBox.h GameObjBox.cpp
+    RenderPass.h RenderPass.cpp
     DDSTextureLoader11.h DDSTextureLoader11.cpp
     HLSL/baseVS.hlsli HLSL/basePS.hlsli
 )

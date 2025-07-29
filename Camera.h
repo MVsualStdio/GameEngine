@@ -9,6 +9,7 @@ public:
 	virtual Eigen::Matrix4f view() = 0;
 	virtual Eigen::Matrix4f projection() = 0;
 	virtual void move(const Eigen::Vector3f& offset) = 0;
+	virtual void forward(float step) = 0;
 };
 
 class ProjectionCamera : public ICamera {
@@ -21,6 +22,7 @@ public:
 	void updateViewMatrix();
 	void updateProjectionMatrix();
 	void move(const Eigen::Vector3f& offset);
+	void forward(float step);
 
 private:
 	float m_fov;

@@ -8,6 +8,7 @@
 #include <variant>
 #include <functional>
 #include "Vertex.h"
+#include "Camera.h"
 
 using Property = std::variant<int, uint32_t, float, Eigen::Matrix4f>;
 
@@ -20,24 +21,22 @@ inline size_t StringToID(std::string_view str)
 class IRenderObject {
 public:
 	virtual void render(double dt) = 0;
-	virtual void updateCamera() = 0;
+	virtual void updateCamera(ICamera* camera) = 0;
 };
 
 class IDrawer {
 public:
+	IDrawer(D3D11Context* context);
 	using DrawFunction = std::function<void(IDrawer* draw)>;
 	virtual void present(double dt) = 0;
-	virtual void init(D3D11Context* context);
 	void addItem(std::shared_ptr<IRenderObject> item);
 	void renderForeach(double dt);
 	virtual ComPtr<ID3D11RenderTargetView> getRenderTarget() = 0;
-	void initDrawFunction(DrawFunction op);
-	void initRender();
-	void updateCamera();
+	void updateCamera(ICamera* camera);
+	std::vector<std::shared_ptr<IRenderObject>> getAllItems();
 protected:
 	std::vector<std::shared_ptr<IRenderObject>> m_items;
 	D3D11Context* m_context = nullptr;
-	DrawFunction m_op;
 };
 
 class IAnim {

@@ -12,7 +12,7 @@ ProjectionCamera::ProjectionCamera(Eigen::Vector3f position, Eigen::Vector3f tar
     , m_viewDirty(true)
     , m_y(Eigen::Vector3f(0,1,0)) {
 
-    m_front = (position - target).normalized();
+    m_front = (m_position - m_target).normalized();
     m_right = m_front.cross(m_y).normalized();
     m_up = m_right.cross(m_front).normalized();
 
@@ -32,7 +32,6 @@ Eigen::Matrix4f ProjectionCamera::projection() {
 void ProjectionCamera::updateViewMatrix()
 {
     if (m_viewDirty) {
-        // ʹ��lookAt����������ͼ����
         m_view = Eigen::Matrix4f::Identity();
 
         Eigen::Vector3f f = m_front;
@@ -94,5 +93,12 @@ void ProjectionCamera::copy(Eigen::Matrix4f& mat, DirectX::XMMATRIX& dxMat) {
 
 void ProjectionCamera::move(const Eigen::Vector3f& offset) {
     m_position += offset;
+    m_viewDirty = true;
+}
+
+void ProjectionCamera::forward(float step) {
+    m_position = m_position - m_front * step;
+    m_right = m_front.cross(m_y).normalized();
+    m_up = m_right.cross(m_front).normalized();
     m_viewDirty = true;
 }

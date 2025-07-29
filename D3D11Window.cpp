@@ -1,6 +1,7 @@
 #include "D3D11Window.h"
 #include <iostream>
 #include <QKeyEvent>
+#include "DrawScreen.h"
 
 D3D11Window::D3D11Window(DrawMangerBase* manger)
     :m_manger(manger) {
@@ -31,10 +32,16 @@ void D3D11Window::paintEvent(QPaintEvent *event)
 void D3D11Window::keyPressEvent(QKeyEvent* event) {
     switch (event->key()) {
         case Qt::Key::Key_W:
-            m_manger->moveMainCamera(0, 0, 0.5f);
+            m_manger->forwardMainCamera(0.5f);
             break;
         case Qt::Key::Key_S:
-            m_manger->moveMainCamera(0, 0, -0.5f);
+            m_manger->forwardMainCamera(-0.5f);
+            break;
+        case Qt::Key::Key_Q:
+            m_manger->setMainCamera(1);
+            break;
+        case Qt::Key::Key_E:
+            m_manger->setMainCamera(0);
             break;
     }
 }

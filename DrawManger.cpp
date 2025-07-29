@@ -23,15 +23,9 @@ void DrawMangerBase::present(double dt) {
 void DrawMangerBase::init(HWND winID, uint32_t width, uint32_t height) {
 	m_context = std::make_shared<D3D11Context>(winID, width, height);
 	initCompent();
-	initDrawer();
-	initMeshRender();
+	prepare();
 }
 
-void DrawMangerBase::initMeshRender() {
-	for (auto draw : m_drawList) {
-		draw->initRender();
-	}
-}
 
 void DrawMangerBase::addMainCamera(int index, std::shared_ptr<ICamera> camera) {
 	addOtherCamera(index, camera);
@@ -50,8 +44,10 @@ void DrawMangerBase::addOtherCamera(int index, std::shared_ptr<ICamera> camera) 
 void DrawMangerBase::setMainCamera(int index) {
 	if (m_cameraList.find(index) != m_cameraList.end()) {
 		m_mainCameraIndex = index;
+		updateCamera();
 	}
 }
+
 ICamera* DrawMangerBase::getCamera(int index) {
 	if (m_cameraList.find(index) != m_cameraList.end()) {
 		return m_cameraList[index].get();
@@ -65,7 +61,7 @@ ICamera* DrawMangerBase::getMainCamera() {
 
 void DrawMangerBase::updateCamera() {
 	for (auto draw : m_drawList) {
-		draw->updateCamera();
+		draw->updateCamera(getMainCamera());
 	}
 }
 
@@ -74,3 +70,15 @@ void DrawMangerBase::moveMainCamera(float x, float y, float z) {
 	updateCamera();
 }
 
+void DrawMangerBase::forwardMainCamera(float step) {
+	getMainCamera()->forward(step);
+	updateCamera();
+}
+
+int DrawMangerBase::getDrawSize() {
+	return m_drawList.size();
+}
+
+IDrawer* DrawMangerBase::getDrawer(int index) {
+	return m_drawList[index];
+}

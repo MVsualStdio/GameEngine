@@ -1,7 +1,7 @@
 #include "IDrawer.h"
 
-void IDrawer::init(D3D11Context* context) {
-	m_context = context;
+IDrawer::IDrawer(D3D11Context* context)
+	: m_context(context) {
 }
 
 void IDrawer::addItem(std::shared_ptr<IRenderObject> item) {
@@ -14,16 +14,12 @@ void IDrawer::renderForeach(double dt) {
 	}
 }
 
-void IDrawer::initDrawFunction(DrawFunction op) {
-	m_op = op;
-}
-
-void IDrawer::initRender() {
-	m_op(this);
-}
-
-void IDrawer::updateCamera() {
+void IDrawer::updateCamera(ICamera* camera) {
 	for (auto item = m_items.begin(); item != m_items.end(); ++item) {
-		(*item)->updateCamera();
+		(*item)->updateCamera(camera);
 	}
+}
+
+std::vector<std::shared_ptr<IRenderObject>> IDrawer::getAllItems() {
+	return m_items;
 }

@@ -6,6 +6,49 @@
 #include <Eigen/Geometry>
 #include "GameObjBox.h"
 
+Scene::Scene(D3D11Context* context, IDrawer* drawer)
+	: m_context(context)
+	, m_drawer(drawer) {
+
+}
+
+Scene::~Scene() {
+
+}
+
+void Scene::render(double dt) {
+	for (const auto& [name, mesh] : m_renderItems) {
+		mesh->render(dt);
+	}
+}
+
+void Scene::updateCamera(ICamera* camera) {
+	for (const auto& [name, mesh] : m_renderItems) {
+		mesh->updateCamera(camera);
+	}
+}
+
+void Scene::addMeshRender(const std::string& name, std::shared_ptr<MeshRender> mesh) {
+	m_renderItems[name] = mesh;
+}
+
+std::shared_ptr<MeshRender> Scene::getRender(const std::string& name) {
+	if (m_renderItems.find(name) != m_renderItems.end()) {
+		return m_renderItems[name];
+	}
+	return nullptr;
+}
+
+const Scene::RenderItem& Scene::getAllRenderItems() {
+	return m_renderItems;
+}
+
+void Scene::setDrawer(IDrawer* drawer) {
+	m_drawer = drawer;
+}
+
+
+
 
 DrawMangerTexture::DrawMangerTexture() {
 
@@ -28,7 +71,11 @@ void DrawMangerTexture::initDrawScreen(IDrawer* draw) {
 	material->getVSShader()->setUniform("g_View", camera->view());
 	material->getVSShader()->setUniform("g_Proj", camera->projection());
 
-	material->getPSShader()->setTexture(0, *texture);
+	RenderPass* renderPass = dynamic_cast<RenderPass*>(m_drawList[0]);
+	if (renderPass) {
+		material->getPSShader()->setTexture(0, *renderPass->getResult());
+	}
+	
 	meshRender->setMaterial(std::shared_ptr<Material>(material));
 	meshRender->setVertex(Geometry::CreateCube(10.0f, 10.0f, 10.0f));
 	
@@ -71,21 +118,14 @@ void DrawMangerTexture::initDrawTexture(IDrawer* draw) {
 	draw->addItem(std::move(meshRender));
 }
 
-void DrawMangerTexture::initDrawer() {
+void DrawMangerTexture::prepare() {
 
-	texture = std::make_shared<Texture2D>(m_context.get(), m_context->width(), m_context->height());
-	DrawTexture* drawTexture = new DrawTexture(texture.get());
-	drawTexture->init(m_context.get());
-	drawTexture->initDrawFunction([this](IDrawer* draw) {
-		initDrawTexture(draw);
-	});
+	RenderPass* drawTexture = new RenderPass(m_context.get());
+	initDrawTexture(drawTexture);
 	m_drawList.push_back(drawTexture);
 
-	DrawScreen* drawScreen = new DrawScreen();
-	drawScreen->init(m_context.get());
-	drawScreen->initDrawFunction([this](IDrawer* draw) {
-		initDrawScreen(draw);
-	});
+	DrawScreen* drawScreen = new DrawScreen(m_context.get());
+	initDrawScreen(drawScreen);
 	m_drawList.push_back(drawScreen);
 
 }
