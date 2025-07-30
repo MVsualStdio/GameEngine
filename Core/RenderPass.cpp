@@ -11,16 +11,23 @@ RenderPass::RenderPass(D3D11Context* context)
 
 }
 
-void RenderPass::present(double dt) {
-	m_context->resetRT();
-	m_context->ClearRT(m_texture->GetRenderTarget());
-	renderForeach(dt);
-}
-
 ComPtr<ID3D11RenderTargetView> RenderPass::getRenderTarget() {
 	return m_texture->GetRenderTarget();
 }
 
 Texture2D* RenderPass::getResult() {
 	return m_texture.get();
+}
+
+void RenderPass::present() {
+	
+}
+
+void RenderPass::onDraw(double dt) {
+	renderForeach(dt);
+}
+
+void RenderPass::clear() {
+	m_context->resetRT();
+	m_context->ClearScreenRT();
 }

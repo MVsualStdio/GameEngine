@@ -12,6 +12,16 @@ public:
 	virtual void forward(float step) = 0;
 };
 
+class NoCamera : public ICamera {
+public:
+	NoCamera() = default;
+	virtual Eigen::Matrix4f view() override;
+	virtual Eigen::Matrix4f projection() override;
+
+	virtual void move(const Eigen::Vector3f& offset) override;
+	virtual void forward(float step) override;
+};
+
 class ProjectionCamera : public ICamera {
 public:
 	ProjectionCamera(Eigen::Vector3f position, Eigen::Vector3f target, float aspectRatio = 16.0f / 9.0f,

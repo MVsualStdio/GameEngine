@@ -9,7 +9,11 @@ class RenderPass : public IDrawer {
 public:
 	//RenderPass(Texture2D* texture);
 	RenderPass(D3D11Context* context);
-	void present(double dt) override;
+
+	void present() override;
+	void onDraw(double dt) override;
+	void clear() override;
+
 	ComPtr<ID3D11RenderTargetView> getRenderTarget() override;
 	Texture2D* getResult();
 private:

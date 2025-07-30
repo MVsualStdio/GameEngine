@@ -10,11 +10,15 @@ public:
 	Scene(D3D11Context* context, IDrawer* drawer);
 	~Scene();
 	void render(double dt) override;
-	void updateCamera(ICamera* camera) override;
+
 	void addMeshRender(const std::string& name, std::shared_ptr<MeshRender> mesh);
 	std::shared_ptr<MeshRender> getRender(const std::string& name);
 	const RenderItem& getAllRenderItems();
 	void setDrawer(IDrawer* drawer);
+
+	void setProjection(Eigen::Matrix4f& projection) override;
+	void setView(Eigen::Matrix4f& view) override;
+
 private:
 	D3D11Context* m_context;
 	RenderItem m_renderItems;

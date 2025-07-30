@@ -6,33 +6,36 @@
 #include "Pipeline.h"
 #include "Camera.h"
 
-
 class MeshRender : public IRenderObject, public IAnim {
 public:
 	using UpdateFunction = std::function<void (MeshRender*, double )>;
-	using UpdateUniform = std::function<void(MeshRender*)>;
+	using UpdateUniform = std::function<void(MeshRender*, const Eigen::Matrix4f&, const Eigen::Matrix4f&)>;
 
 	MeshRender(IDrawer* drawer, D3D11Context* context);
 
 	void setMaterial(std::shared_ptr<Material> material);
 	void setVertex(VertexUVData vertex);
 	void setUpdateFun(UpdateFunction update);
-	void setUpdateUniform(UpdateUniform update);
-	void setRenderCamera(ICamera* camera);
+	void setUpdateCamera(UpdateUniform update);
+
 	Material* getMaterial() { return m_material.get(); }
-	ICamera* getRenderCamera() { return m_camera; }
 
 	void render(double dt) override;
-	void updateCamera(ICamera* camera) override;
-
 	void tick(double dt) override;
-	void cameraChange() override;
+	void cameraChange(const Eigen::Matrix4f& view, const Eigen::Matrix4f& projection) override;
+
+	void setWorld(Eigen::Matrix4f& world);
+	void setView(Eigen::Matrix4f& view) override;
+	void setProjection(Eigen::Matrix4f& projection) override;
+
 
 protected:
 	D3D11Context* m_context;
 	IDrawer* m_drawer;
-	ICamera* m_camera;
 
+	Eigen::Matrix4f m_world;
+	Eigen::Matrix4f m_view;
+	Eigen::Matrix4f m_projection;
 private:
 	std::shared_ptr<Pipeline> m_pipeline;
 	std::shared_ptr<Material> m_material;
@@ -41,4 +44,5 @@ private:
 protected:
 	UpdateFunction m_update;
 	UpdateUniform m_cameraUpdate;
+
 };

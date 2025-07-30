@@ -32,16 +32,16 @@ void D3D11Window::paintEvent(QPaintEvent *event)
 void D3D11Window::keyPressEvent(QKeyEvent* event) {
     switch (event->key()) {
         case Qt::Key::Key_W:
-            m_manger->forwardMainCamera(0.5f);
+            m_manger->forwardCamera(m_manger->getScreenDrawer(), m_manger->getCurCameraGroupIndex(m_manger->getScreenDrawer()),0,0.5f);
             break;
         case Qt::Key::Key_S:
-            m_manger->forwardMainCamera(-0.5f);
+            m_manger->forwardCamera(m_manger->getScreenDrawer(), m_manger->getCurCameraGroupIndex(m_manger->getScreenDrawer()),0,-0.5f);
             break;
         case Qt::Key::Key_Q:
-            m_manger->setMainCamera(1);
+            m_manger->setCurCameraManager(m_manger->getScreenDrawer(), 1);
             break;
         case Qt::Key::Key_E:
-            m_manger->setMainCamera(0);
+            m_manger->setCurCameraManager(m_manger->getScreenDrawer(), 0);
             break;
     }
 }

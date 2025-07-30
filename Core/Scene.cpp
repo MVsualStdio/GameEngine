@@ -21,12 +21,6 @@ void Scene::render(double dt) {
 	}
 }
 
-void Scene::updateCamera(ICamera* camera) {
-	for (const auto& [name, mesh] : m_renderItems) {
-		mesh->updateCamera(camera);
-	}
-}
-
 void Scene::addMeshRender(const std::string& name, std::shared_ptr<MeshRender> mesh) {
 	m_renderItems[name] = mesh;
 }
@@ -46,3 +40,14 @@ void Scene::setDrawer(IDrawer* drawer) {
 	m_drawer = drawer;
 }
 
+void Scene::setProjection(Eigen::Matrix4f& projection) {
+	for (const auto& [name, mesh] : m_renderItems) {
+		mesh->setProjection(projection);
+	}
+}
+
+void Scene::setView(Eigen::Matrix4f& view) {
+	for (const auto& [name, mesh] : m_renderItems) {
+		mesh->setView(view);
+	}
+}

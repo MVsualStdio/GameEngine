@@ -1,6 +1,22 @@
 #include "Camera.h"
 
 
+Eigen::Matrix4f NoCamera::view() {
+    return Eigen::Matrix4f::Identity();
+}
+
+Eigen::Matrix4f NoCamera::projection() {
+    return Eigen::Matrix4f::Identity();
+}
+
+void NoCamera::move(const Eigen::Vector3f& offset) {
+
+}
+void NoCamera::forward(float step) {
+
+}
+
+
 ProjectionCamera::ProjectionCamera(Eigen::Vector3f position, Eigen::Vector3f target, float aspectRatio,
     float fov, float zNear, float zFar)
     : m_position(position)

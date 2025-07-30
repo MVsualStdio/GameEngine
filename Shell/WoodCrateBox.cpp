@@ -2,11 +2,10 @@
 #include "../Core/DDSTextureLoader11.h"
 #include "../Core/MeshFilter.h"
 
-WoodCrateBox::WoodCrateBox(IDrawer* drawer, D3D11Context* context, ICamera* camera, Texture2D& texture)
+WoodCrateBox::WoodCrateBox(IDrawer* drawer, D3D11Context* context, Texture2D& texture)
 	: MeshRender(drawer, context)
 	, m_texture(texture){
 
-	setRenderCamera(camera);
 	ID3D11ShaderResourceView* textureView;
 	DirectX::CreateDDSTextureFromFile(context->m_Device.Get(), L"E:/LearnSomething/RTTR/HLSL/WoodCrate.dds", nullptr, &textureView);
 	Texture2D textureDDS(context, textureView);
@@ -17,8 +16,8 @@ WoodCrateBox::WoodCrateBox(IDrawer* drawer, D3D11Context* context, ICamera* came
 	Eigen::Matrix4f world = Eigen::Matrix4f::Identity();
 	//world(3, 2) = 30;
 	material->getVSShader()->setUniform("g_World", world);
-	material->getVSShader()->setUniform("g_View", camera->view());
-	material->getVSShader()->setUniform("g_Proj", camera->projection());
+	//material->getVSShader()->setUniform("g_View", camera->view());
+	//material->getVSShader()->setUniform("g_Proj", camera->projection());
 
 	material->getPSShader()->setTexture(0, textureDDS);
 	material->getPSShader()->setTexture(1, m_texture);
@@ -34,7 +33,7 @@ void WoodCrateBox::tick(double dt) {
 	getMaterial()->getVSShader()->setUniform("g_World", world);
 }
 
-void WoodCrateBox::cameraChange() {
-	getMaterial()->getVSShader()->setUniform("g_View", m_camera->view());
-	getMaterial()->getVSShader()->setUniform("g_Proj", m_camera->projection());
+void WoodCrateBox::cameraChange(const Eigen::Matrix4f& view, const Eigen::Matrix4f& projection) {
+	getMaterial()->getVSShader()->setUniform("g_View", view);
+	getMaterial()->getVSShader()->setUniform("g_Proj", projection);
 }

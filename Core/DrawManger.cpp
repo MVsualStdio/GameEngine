@@ -15,9 +15,17 @@ DrawMangerBase::~DrawMangerBase() {
 }
 
 void DrawMangerBase::present(double dt) {
+	
 	for (IDrawer* drawer : m_drawList) {
-		drawer->present(dt);
+		auto curCameraGroup = getCurCameraGroup(drawer);
+		drawer->clear();
+		for (auto& [index, camera] : curCameraGroup) {
+			drawer->updateCamera(camera.get());
+			drawer->onDraw(dt);
+		}
+		drawer->present();
 	}
+
 }
 
 void DrawMangerBase::init(HWND winID, uint32_t width, uint32_t height) {
@@ -26,52 +34,62 @@ void DrawMangerBase::init(HWND winID, uint32_t width, uint32_t height) {
 	prepare();
 }
 
-
-void DrawMangerBase::addMainCamera(int index, std::shared_ptr<ICamera> camera) {
-	addOtherCamera(index, camera);
-	m_mainCameraIndex = index;
-}
-
-void DrawMangerBase::addOtherCamera(int index, std::shared_ptr<ICamera> camera) {
-	if (m_cameraList.find(index) == m_cameraList.end()) {
-		m_cameraList.emplace(std::pair{ index,camera });
-	}
-	else {
-		m_cameraList[index] = camera;
+void DrawMangerBase::addCamera(IDrawer* drawer, int group, int index, std::shared_ptr<ICamera> camera) {
+	if (drawer != nullptr) {
+		m_cameraManager[drawer].addCamera(group, index, camera);
 	}
 }
 
-void DrawMangerBase::setMainCamera(int index) {
-	if (m_cameraList.find(index) != m_cameraList.end()) {
-		m_mainCameraIndex = index;
-		updateCamera();
-	}
-}
-
-ICamera* DrawMangerBase::getCamera(int index) {
-	if (m_cameraList.find(index) != m_cameraList.end()) {
-		return m_cameraList[index].get();
+ICamera* DrawMangerBase::getCamera(IDrawer* drawer, int group, int index) {
+	if (drawer != nullptr && m_cameraManager.find(drawer) != m_cameraManager.end()) {
+		m_cameraManager[drawer].getCamera(group, index);
 	}
 	return nullptr;
 }
 
-ICamera* DrawMangerBase::getMainCamera() {
-	return getCamera(m_mainCameraIndex);
+std::unordered_map<int, std::shared_ptr<ICamera>> DrawMangerBase::getCameraGroup(IDrawer* drawer, int group) {
+	if (drawer != nullptr && m_cameraManager.find(drawer) != m_cameraManager.end()) {
+		return m_cameraManager[drawer].getCameraGroup(group);
+	}
+	return std::unordered_map<int, std::shared_ptr<ICamera>>();
+}
+
+std::unordered_map<int, std::shared_ptr<ICamera>> DrawMangerBase::getCurCameraGroup(IDrawer* drawer) {
+	if (drawer != nullptr && m_cameraManager.find(drawer) != m_cameraManager.end()) {
+		return m_cameraManager[drawer].getCurCameraGroup();
+	}
+	return std::unordered_map<int, std::shared_ptr<ICamera>>();
+}
+
+int DrawMangerBase::getCurCameraGroupIndex(IDrawer* drawer) {
+	if (drawer != nullptr && m_cameraManager.find(drawer) != m_cameraManager.end()) {
+		return m_cameraManager[drawer].getCurCameraGroupIndex();
+	}
+	return 0;
+}
+
+void DrawMangerBase::setCurCameraManager(IDrawer* drawer, int group) {
+	if (drawer != nullptr && m_cameraManager.find(drawer) != m_cameraManager.end()) {
+		m_cameraManager[drawer].setCurCameraGroup(group);
+	}
 }
 
 void DrawMangerBase::updateCamera() {
 	for (auto draw : m_drawList) {
-		draw->updateCamera(getMainCamera());
+		auto curCameraGroup = getCurCameraGroup(draw);
+		for (auto& [index, camera] : curCameraGroup) {
+			draw->updateCamera(camera.get());
+		}
 	}
 }
 
-void DrawMangerBase::moveMainCamera(float x, float y, float z) {
-	getMainCamera()->move(Eigen::Vector3f{ x,y,z });
+void DrawMangerBase::moveCamera(IDrawer* drawer, int group, int index, float x, float y, float z) {
+	getCamera(drawer, group, index)->move(Eigen::Vector3f{ x,y,z });
 	updateCamera();
 }
 
-void DrawMangerBase::forwardMainCamera(float step) {
-	getMainCamera()->forward(step);
+void DrawMangerBase::forwardCamera(IDrawer* drawer, int group, int index, float step) {
+	getCamera(drawer, group, index)->forward(step);
 	updateCamera();
 }
 
@@ -81,4 +99,14 @@ int DrawMangerBase::getDrawSize() {
 
 IDrawer* DrawMangerBase::getDrawer(int index) {
 	return m_drawList[index];
+}
+
+IDrawer* DrawMangerBase::getScreenDrawer() {
+	for (auto& drawer : m_drawList) {
+		DrawScreen* drawScreen = dynamic_cast<DrawScreen*>(drawer);
+		if (drawScreen) {
+			return drawScreen;
+		}
+	}
+	return nullptr;
 }

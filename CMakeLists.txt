@@ -32,6 +32,7 @@ set(CoreFiles
     Core/Camera.h Core/Camera.cpp
     Core/DDSTextureLoader11.h Core/DDSTextureLoader11.cpp
     Core/RenderPass.h Core/RenderPass.cpp
+    Core/CameraManager.h Core/CameraManager.cpp
 )
 
 set(ShellFiles     
@@ -45,6 +46,7 @@ set(WindowFiles
 
 set(ResourceFiles
     HLSL/baseVS.hlsli HLSL/basePS.hlsli
+    HLSL/woodCrateBox.hlsli
 )
 
 source_group("Core Files" FILES ${CoreFiles})

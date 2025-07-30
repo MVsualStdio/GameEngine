@@ -21,14 +21,20 @@ inline size_t StringToID(std::string_view str)
 class IRenderObject {
 public:
 	virtual void render(double dt) = 0;
-	virtual void updateCamera(ICamera* camera) = 0;
+
+	virtual void setProjection(Eigen::Matrix4f& projection) = 0;
+	virtual void setView(Eigen::Matrix4f& view) = 0;
 };
 
 class IDrawer {
 public:
 	IDrawer(D3D11Context* context);
 	using DrawFunction = std::function<void(IDrawer* draw)>;
-	virtual void present(double dt) = 0;
+
+	virtual void present() = 0;
+	virtual void onDraw(double dt) = 0;
+	virtual void clear() = 0;
+
 	void addItem(std::shared_ptr<IRenderObject> item);
 	void renderForeach(double dt);
 	virtual ComPtr<ID3D11RenderTargetView> getRenderTarget() = 0;
@@ -42,7 +48,7 @@ protected:
 class IAnim {
 public:
 	virtual void tick(double dt) = 0;
-	virtual void cameraChange() = 0;
+	virtual void cameraChange(const Eigen::Matrix4f& view, const Eigen::Matrix4f& projection) = 0;
 };
 
 
