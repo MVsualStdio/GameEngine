@@ -9,7 +9,7 @@
 class MeshRender : public IRenderObject, public IAnim {
 public:
 	using UpdateFunction = std::function<void (MeshRender*, double )>;
-	using UpdateUniform = std::function<void(MeshRender*, const Eigen::Matrix4f&, const Eigen::Matrix4f&)>;
+	using UpdateUniform = std::function<void(MeshRender*, ICamera* camera)>;
 
 	MeshRender(IDrawer* drawer, D3D11Context* context);
 
@@ -22,11 +22,10 @@ public:
 
 	void render(double dt) override;
 	void tick(double dt) override;
-	void cameraChange(const Eigen::Matrix4f& view, const Eigen::Matrix4f& projection) override;
+	void cameraChange(ICamera* camera) override;
 
 	void setWorld(Eigen::Matrix4f& world);
-	void setView(Eigen::Matrix4f& view) override;
-	void setProjection(Eigen::Matrix4f& projection) override;
+	void setCamera(ICamera* camera) override;
 
 
 protected:
@@ -34,8 +33,7 @@ protected:
 	IDrawer* m_drawer;
 
 	Eigen::Matrix4f m_world;
-	Eigen::Matrix4f m_view;
-	Eigen::Matrix4f m_projection;
+	ICamera* m_camera;
 private:
 	std::shared_ptr<Pipeline> m_pipeline;
 	std::shared_ptr<Material> m_material;

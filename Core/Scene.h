@@ -16,8 +16,7 @@ public:
 	const RenderItem& getAllRenderItems();
 	void setDrawer(IDrawer* drawer);
 
-	void setProjection(Eigen::Matrix4f& projection) override;
-	void setView(Eigen::Matrix4f& view) override;
+	void setCamera(ICamera* camera) override;
 
 private:
 	D3D11Context* m_context;

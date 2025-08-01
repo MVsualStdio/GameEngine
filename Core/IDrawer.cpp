@@ -16,8 +16,7 @@ void IDrawer::renderForeach(double dt) {
 
 void IDrawer::updateCamera(ICamera* camera) {
 	for (auto& item = m_items.begin(); item != m_items.end(); ++item) {
-		(*item)->setView(camera->view());
-		(*item)->setProjection(camera->projection());
+		(*item)->setCamera(camera);
 	}
 }
 

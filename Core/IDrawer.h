@@ -10,7 +10,7 @@
 #include "Vertex.h"
 #include "Camera.h"
 
-using Property = std::variant<int, uint32_t, float, Eigen::Matrix4f>;
+using Property = std::variant<int, uint32_t, float, Eigen::Matrix4f, Eigen::Vector3f>;
 
 inline size_t StringToID(std::string_view str)
 {
@@ -22,8 +22,7 @@ class IRenderObject {
 public:
 	virtual void render(double dt) = 0;
 
-	virtual void setProjection(Eigen::Matrix4f& projection) = 0;
-	virtual void setView(Eigen::Matrix4f& view) = 0;
+	virtual void setCamera(ICamera* camera) = 0;
 };
 
 class IDrawer {
@@ -48,7 +47,7 @@ protected:
 class IAnim {
 public:
 	virtual void tick(double dt) = 0;
-	virtual void cameraChange(const Eigen::Matrix4f& view, const Eigen::Matrix4f& projection) = 0;
+	virtual void cameraChange(ICamera* camera) = 0;
 };
 
 

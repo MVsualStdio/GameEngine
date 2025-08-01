@@ -52,6 +52,7 @@ private:
 	{
 		PropertyFunctor(ConstantBufferVariable& _cbv) : cbv(_cbv) {}
 		void operator()(const Eigen::Matrix4f& val) { cbv.SetFloatMatrix(4, 4, val.data()); }
+		void operator()(const Eigen::Vector3f& val) { cbv.SetFloatMatrix(1, 3, val.data()); }
 		void operator()(int value) {  }
 		void operator()(float value) {  }
 		void operator()(uint32_t value) {  }

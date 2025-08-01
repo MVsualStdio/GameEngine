@@ -23,6 +23,8 @@ public:
 
 	void moveCamera(IDrawer* drawer, int group, int index, float x, float y, float z);
 	void forwardCamera(IDrawer* drawer, int group, int index, float step);
+	void rightCamera(IDrawer* drawer, int group, int index, float step);
+	void rotateCamera(IDrawer* drawer, int group, int index, float yaw, float pitch);
 
 	void updateCamera();
 

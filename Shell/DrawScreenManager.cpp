@@ -9,7 +9,7 @@ DrawMangerScreen::DrawMangerScreen() {
 }
 
 void DrawMangerScreen::initScene() {
-	std::shared_ptr<MeshRender> box = std::make_shared<WoodCrateBox>(m_drawScreen, m_context.get(), *m_Tranglepass->getResult());
+	std::shared_ptr<MeshRender> box = std::make_shared<WoodCrateBox>(m_drawScreen, m_context.get(), m_scene.get(), *m_Tranglepass->getResult());
 	m_scene->addMeshRender("box", box);
 }
 
@@ -22,18 +22,19 @@ void DrawMangerScreen::initTranglePass() {
 	Material* material = new Material(m_context.get());
 	material->setVSShader(L"E:/LearnSomething/RTTR/HLSL/baseVS.hlsli");
 	material->setPSShader(L"E:/LearnSomething/RTTR/HLSL/basePS.hlsli");
-	material->getVSShader()->setUniform("g_World", Eigen::Matrix4f::Identity());
+	Eigen::Matrix4f world = Eigen::Matrix4f::Identity();
+	material->getVSShader()->setUniform("g_World", world);
 
 	material->getPSShader()->setTexture(0, textureDDS);
 	trangle->setMaterial(std::shared_ptr<Material>(material));
 	Eigen::Vector3f points[3] = { { 0.0f, 0.5f, 0.5f },{ 0.5f, -0.5f, 0.5f },{ -0.5f, -0.5f, 0.5f } };
 	trangle->setVertex(Geometry::CreateTrangle(points));
 
-	trangle->setUpdateCamera([](MeshRender* render, const Eigen::Matrix4f& view, const Eigen::Matrix4f& projection) {
-		render->getMaterial()->getVSShader()->setUniform("g_View", Eigen::Matrix4f::Identity());
-		render->getMaterial()->getVSShader()->setUniform("g_Proj", Eigen::Matrix4f::Identity());
+	trangle->setUpdateCamera([](MeshRender* render, const ICamera* camera) {
+		Eigen::Matrix4f identity = Eigen::Matrix4f::Identity();
+		render->getMaterial()->getVSShader()->setUniform("g_View", identity);
+		render->getMaterial()->getVSShader()->setUniform("g_Proj", identity);
 	});
-
 
 	m_Tranglepass->addItem(std::move(trangle));
 }
@@ -47,7 +48,6 @@ void DrawMangerScreen::initCompent() {
 	m_drawScreen = new DrawScreen(m_context.get());
 
 	addCamera(m_drawScreen, 0, 0, camera);
-	addCamera(m_drawScreen, 0, 1, camera2);
 	addCamera(m_drawScreen, 1, 0, camera2);
 	
 	addCamera(m_Tranglepass, 0, 0, nocamera);

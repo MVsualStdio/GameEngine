@@ -1,21 +1,34 @@
 #include "Camera.h"
 
 
-Eigen::Matrix4f NoCamera::view() {
+const Eigen::Matrix4f NoCamera::view() {
     return Eigen::Matrix4f::Identity();
 }
 
-Eigen::Matrix4f NoCamera::projection() {
+const Eigen::Matrix4f NoCamera::projection() {
     return Eigen::Matrix4f::Identity();
 }
 
 void NoCamera::move(const Eigen::Vector3f& offset) {
 
 }
+
 void NoCamera::forward(float step) {
 
 }
 
+void NoCamera::right(float step) {
+
+}
+
+void NoCamera::rotate(float yaw, float pitch) {
+
+}
+
+
+const Eigen::Vector3f NoCamera::position() {
+    return Eigen::Vector3f();
+}
 
 ProjectionCamera::ProjectionCamera(Eigen::Vector3f position, Eigen::Vector3f target, float aspectRatio,
     float fov, float zNear, float zFar)
@@ -36,13 +49,17 @@ ProjectionCamera::ProjectionCamera(Eigen::Vector3f position, Eigen::Vector3f tar
     updateProjectionMatrix();
 }
 
-Eigen::Matrix4f ProjectionCamera::view() {
+const Eigen::Matrix4f ProjectionCamera::view() {
     updateViewMatrix();
     return m_view;
 }
 
-Eigen::Matrix4f ProjectionCamera::projection() {
+const Eigen::Matrix4f ProjectionCamera::projection() {
     return m_projection;
+}
+
+const Eigen::Vector3f ProjectionCamera::position() {
+    return m_position;
 }
 
 void ProjectionCamera::updateViewMatrix()
@@ -116,5 +133,32 @@ void ProjectionCamera::forward(float step) {
     m_position = m_position - m_front * step;
     m_right = m_front.cross(m_y).normalized();
     m_up = m_right.cross(m_front).normalized();
+    m_viewDirty = true;
+}
+
+void ProjectionCamera::right(float step) {
+    m_position = m_position - m_right * step;
+    m_right = m_front.cross(m_y).normalized();
+    m_up = m_right.cross(m_front).normalized();
+    m_viewDirty = true;
+}
+
+void ProjectionCamera::rotate(float yaw, float pitch) {
+    //pitch = std::clamp(pitch, -89.0f, 89.0f);
+    //yaw = std::clamp(yaw, -89.0f, 89.0f);
+
+    float yawRad = yaw * M_PI / 180.0f;
+    float pitchRad = pitch * M_PI / 180.0f;
+
+    // 使用四元数组合旋转
+    Eigen::Quaternionf qYaw(Eigen::AngleAxisf(yawRad, m_up));
+    Eigen::Quaternionf qPitch(Eigen::AngleAxisf(pitchRad, m_right));
+    Eigen::Quaternionf totalRot = qYaw * qPitch;
+
+    // 应用旋转到方向向量
+    m_front = totalRot * m_front;
+    m_right = m_front.cross(m_y).normalized(); // 使用固定的世界 "上" 向量
+    m_up = m_right.cross(m_front).normalized();
+
     m_viewDirty = true;
 }

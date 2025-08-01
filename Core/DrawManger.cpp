@@ -42,7 +42,7 @@ void DrawMangerBase::addCamera(IDrawer* drawer, int group, int index, std::share
 
 ICamera* DrawMangerBase::getCamera(IDrawer* drawer, int group, int index) {
 	if (drawer != nullptr && m_cameraManager.find(drawer) != m_cameraManager.end()) {
-		m_cameraManager[drawer].getCamera(group, index);
+		return m_cameraManager[drawer].getCamera(group, index);
 	}
 	return nullptr;
 }
@@ -90,6 +90,17 @@ void DrawMangerBase::moveCamera(IDrawer* drawer, int group, int index, float x, 
 
 void DrawMangerBase::forwardCamera(IDrawer* drawer, int group, int index, float step) {
 	getCamera(drawer, group, index)->forward(step);
+	updateCamera();
+}
+
+
+void DrawMangerBase::rightCamera(IDrawer* drawer, int group, int index, float step) {
+	getCamera(drawer, group, index)->right(step);
+	updateCamera();
+}
+
+void DrawMangerBase::rotateCamera(IDrawer* drawer, int group, int index, float yaw, float pitch) {
+	getCamera(drawer, group, index)->rotate(yaw, pitch);
 	updateCamera();
 }
 

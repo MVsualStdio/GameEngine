@@ -17,10 +17,16 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
     QPaintEngine* paintEngine() const;
     void keyPressEvent(QKeyEvent* event);
+    void mouseMoveEvent(QMouseEvent* event);
+    void mousePressEvent(QMouseEvent* event);
+
 private:
     DrawMangerBase* m_manger;
     std::chrono::steady_clock::time_point m_preTime;
     std::chrono::steady_clock::time_point m_curTime;
+
+    QPoint m_mouseLastPox;
+
 };
 
 
