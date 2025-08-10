@@ -1,15 +1,22 @@
 #pragma once
 
+#include "../Core/Component/Component.h"
+#include "../Core/Component/Transform.h"
+#include "../Core/IDrawer.h"
 #include "../Core/MeshRender.h"
-#include "../Core/Scene.h"
 
-class WoodCrateBox : public MeshRender {
+class WoodCrateBox : public Component {
 public:
-	WoodCrateBox(IDrawer* draw, D3D11Context* context, Scene* scene, Texture2D& texture);
-	void tick(double dt) override;
-	void cameraChange(ICamera* canera) override;
+	WoodCrateBox();
+	~WoodCrateBox() = default;
+	void init(IDrawer* draw, D3D11Context* context, Texture2D* texture);
+	void update(double dt)override;
 private:
+	const double M_PI = 3.14159265358979323846;
 	double m_time = 0.0;
-	Texture2D m_texture;
-	Scene* m_scene;
+	Transform* m_transform;
+	MeshRender* m_render;
+	Transform* m_cameraTransfrom;
+	Camera* m_camera;
+	Texture2D* m_texture;
 };

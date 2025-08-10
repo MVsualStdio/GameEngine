@@ -23,10 +23,6 @@ void RenderPass::present() {
 	
 }
 
-void RenderPass::onDraw(double dt) {
-	renderForeach(dt);
-}
-
 void RenderPass::clear() {
 	m_context->resetRT();
 	m_context->ClearScreenRT();

@@ -10,6 +10,8 @@
 #include "Vertex.h"
 #include "Camera.h"
 
+class MeshRender;
+
 using Property = std::variant<int, uint32_t, float, Eigen::Matrix4f, Eigen::Vector3f>;
 
 inline size_t StringToID(std::string_view str)
@@ -20,9 +22,7 @@ inline size_t StringToID(std::string_view str)
 
 class IRenderObject {
 public:
-	virtual void render(double dt) = 0;
-
-	virtual void setCamera(ICamera* camera) = 0;
+	virtual void render(Camera* camera) = 0;
 };
 
 class IDrawer {
@@ -31,23 +31,20 @@ public:
 	using DrawFunction = std::function<void(IDrawer* draw)>;
 
 	virtual void present() = 0;
-	virtual void onDraw(double dt) = 0;
+	virtual void onDraw(Camera* camera);
 	virtual void clear() = 0;
 
-	void addItem(std::shared_ptr<IRenderObject> item);
-	void renderForeach(double dt);
+	void addItem(MeshRender* item);
 	virtual ComPtr<ID3D11RenderTargetView> getRenderTarget() = 0;
-	void updateCamera(ICamera* camera);
-	std::vector<std::shared_ptr<IRenderObject>> getAllItems();
+	std::vector<MeshRender*> getAllItems();
 protected:
-	std::vector<std::shared_ptr<IRenderObject>> m_items;
+	std::vector<MeshRender*> m_items;
 	D3D11Context* m_context = nullptr;
 };
 
 class IAnim {
 public:
 	virtual void tick(double dt) = 0;
-	virtual void cameraChange(ICamera* camera) = 0;
 };
 
 

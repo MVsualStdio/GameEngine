@@ -10,9 +10,9 @@ class DrawMangerScreen : public DrawMangerBase {
 public:
 	DrawMangerScreen();
 private:
-	void prepare() override;
 	void initCompent() override;
 protected:
+	void initCamera();
 	void initScene();
 	void initTranglePass();
 private:

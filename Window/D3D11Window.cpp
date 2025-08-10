@@ -2,12 +2,13 @@
 #include <iostream>
 #include <QKeyEvent>
 #include "../Core/DrawScreen.h"
+#include "../Core/InputControl.h"
 
 D3D11Window::D3D11Window(DrawMangerBase* manger)
     :m_manger(manger) {
 
-    setMouseTracking(true); // 实时监听鼠标移动（无需按下按键）
-    setCursor(Qt::BlankCursor); // 隐藏鼠标指针（可选）
+    setMouseTracking(true); 
+    setCursor(Qt::BlankCursor); 
     grabMouse();
 
     setAttribute(Qt::WA_PaintOnScreen);
@@ -37,22 +38,28 @@ void D3D11Window::paintEvent(QPaintEvent *event)
 void D3D11Window::keyPressEvent(QKeyEvent* event) {
     switch (event->key()) {
         case Qt::Key::Key_W:
-            m_manger->forwardCamera(m_manger->getScreenDrawer(), m_manger->getCurCameraGroupIndex(m_manger->getScreenDrawer()),0,0.5f);
+            InputControl::keyPress(KEY_CODE_W);
+            //m_manger->forwardCamera(m_manger->getScreenDrawer(), m_manger->getCurCameraGroupIndex(m_manger->getScreenDrawer()),0,0.5f);
             break;
         case Qt::Key::Key_S:
-            m_manger->forwardCamera(m_manger->getScreenDrawer(), m_manger->getCurCameraGroupIndex(m_manger->getScreenDrawer()),0,-0.5f);
+            InputControl::keyPress(KEY_CODE_S);
+            //m_manger->forwardCamera(m_manger->getScreenDrawer(), m_manger->getCurCameraGroupIndex(m_manger->getScreenDrawer()),0,-0.5f);
             break;
         case Qt::Key::Key_A:
-            m_manger->rightCamera(m_manger->getScreenDrawer(), m_manger->getCurCameraGroupIndex(m_manger->getScreenDrawer()), 0, 0.5f);
+            InputControl::keyPress(KEY_CODE_A);
+            //m_manger->rightCamera(m_manger->getScreenDrawer(), m_manger->getCurCameraGroupIndex(m_manger->getScreenDrawer()), 0, -0.5f);
             break;
         case Qt::Key::Key_D:
-            m_manger->rightCamera(m_manger->getScreenDrawer(), m_manger->getCurCameraGroupIndex(m_manger->getScreenDrawer()), 0, -0.5f);
+            InputControl::keyPress(KEY_CODE_D);
+           // m_manger->rightCamera(m_manger->getScreenDrawer(), m_manger->getCurCameraGroupIndex(m_manger->getScreenDrawer()), 0, 0.5f);
             break;
         case Qt::Key::Key_Q:
-            m_manger->setCurCameraManager(m_manger->getScreenDrawer(), 1);
+            InputControl::keyPress(KEY_CODE_Q);
+            //m_manger->setCurCameraManager(m_manger->getScreenDrawer(), 1);
             break;
         case Qt::Key::Key_E:
-            m_manger->setCurCameraManager(m_manger->getScreenDrawer(), 0);
+            InputControl::keyPress(KEY_CODE_E);
+            //m_manger->setCurCameraManager(m_manger->getScreenDrawer(), 0);
             break;
         case Qt::Key::Key_Escape:
             close();
@@ -61,26 +68,23 @@ void D3D11Window::keyPressEvent(QKeyEvent* event) {
 }
 
 void D3D11Window::mousePressEvent(QMouseEvent* event) {
-    m_mouseLastPox = event->pos(); // 记录初始鼠标位置
+    m_mouseLastPox = event->pos(); 
 }
 
 
 void D3D11Window::mouseMoveEvent(QMouseEvent* event) {
     QPoint center = rect().center();
 
-    // 2. 计算鼠标偏移量（用于旋转）
     float dx = event->x() - center.x();
     float dy = event->y() - center.y();
 
     m_mouseLastPox = event->pos();
 
-    // 调整旋转灵敏度
     float sensitivity = 0.1f;
     dx *= sensitivity;
     dy *= sensitivity;
-
-    m_manger->rotateCamera(m_manger->getScreenDrawer(), m_manger->getCurCameraGroupIndex(m_manger->getScreenDrawer()), 0, dx,dy);
-
+    InputControl::mouseMove(dx, dy);
+    //m_manger->rotateCamera(m_manger->getScreenDrawer(), m_manger->getCurCameraGroupIndex(m_manger->getScreenDrawer()), 0, dx,dy);
     QCursor::setPos(mapToGlobal(center));
 }
 

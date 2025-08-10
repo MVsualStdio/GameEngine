@@ -1,40 +1,49 @@
-﻿#include "MeshRender.h"
+﻿#include <rttr/registration>
+
+#include "MeshRender.h"
 #include <d3dcompiler.h>
+#include "Component/GameObject.h"
 
 
+RTTR_REGISTRATION
+{
+	rttr::registration::class_<MeshRender>("MeshRender")
+			.constructor<>()(rttr::policy::ctor::as_raw_ptr);
+}
 
-MeshRender::MeshRender(IDrawer* drawer, D3D11Context* context)
-	: m_context(context)
-	, m_drawer(drawer)
-	, m_needUpdateUniform(true)
-	, m_camera(nullptr)
-	, m_world(Eigen::Matrix4f::Identity()) {
+MeshRender::MeshRender()
+	: m_context(nullptr) {
+	m_cameraOp = [](MeshRender*, Camera*) {
 
-	m_update = [this](MeshRender* /*render*/, double dt) {
-		this->tick(dt); 
-	};
-
-	m_cameraUpdate = [this](MeshRender* /*render*/, ICamera* camera) {
-		this->cameraChange(camera);
 	};
 }
 
-void MeshRender::render(double dt) {
+void MeshRender::init(IDrawer* drawer, D3D11Context* context) {
+	m_context = context;
+	m_drawer = drawer;
+}
+
+void MeshRender::cameraRender(MeshRender::CameraChangeFunction op) {
+	m_cameraOp = op;
+}
+
+void MeshRender::render(Camera* camera) {
 	m_pipeline = std::make_shared<Pipeline>(m_context, m_material.get(), &m_vertex, m_drawer);
-	m_update(this, dt);
+	
+	if (gameObject()->getLayer() & camera->getCullMask() == 0) {
+		return;
+	}
 
-	m_cameraUpdate(this, m_camera);
-	//if (m_needUpdateUniform) {
-	//	m_cameraUpdate(this, m_camera);
-	//	m_needUpdateUniform = false;
-	//}
-
-	m_pipeline->IA();
-	m_pipeline->VS();
-	m_pipeline->Rasterizer();
-	m_pipeline->PS();
-	m_pipeline->OM();
-	m_pipeline->DrawIndex();
+	if (m_drawer == camera->getRenderPass()) {
+		m_cameraOp(this, camera);
+		m_pipeline->IA();
+		m_pipeline->VS();
+		m_pipeline->Rasterizer();
+		m_pipeline->PS();
+		m_pipeline->OM();
+		m_pipeline->DrawIndex();
+	}
+	
 }
 
 void MeshRender::setMaterial(std::shared_ptr<Material> material) {
@@ -43,28 +52,4 @@ void MeshRender::setMaterial(std::shared_ptr<Material> material) {
 
 void MeshRender::setVertex(VertexUVData vertex) {
 	m_vertex = vertex;
-}
-
-void MeshRender::setUpdateFun(UpdateFunction update) {
-	m_update = update;
-}
-
-void MeshRender::setUpdateCamera(UpdateUniform update) {
-	m_cameraUpdate = update;
-}
-
-void MeshRender::setWorld(Eigen::Matrix4f& world) {
-	m_world = world;
-}
-
-void MeshRender::setCamera(ICamera* camera) {
-	m_camera = camera;
-}
-
-void MeshRender::tick(double dt) {
-
-}
-
-void MeshRender::cameraChange(ICamera* camera) {
-
 }

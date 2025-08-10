@@ -5,42 +5,30 @@
 #include "IDrawer.h"
 #include "Pipeline.h"
 #include "Camera.h"
+#include <unordered_set>
 
-class MeshRender : public IRenderObject, public IAnim {
+class MeshRender : public Component {
 public:
-	using UpdateFunction = std::function<void (MeshRender*, double )>;
-	using UpdateUniform = std::function<void(MeshRender*, ICamera* camera)>;
+	using CameraChangeFunction = std::function<void(MeshRender*, Camera* )>;
+	MeshRender();
+	void init(IDrawer* drawer, D3D11Context* context);
 
-	MeshRender(IDrawer* drawer, D3D11Context* context);
-
+	IDrawer* getPass() { return m_drawer; }
 	void setMaterial(std::shared_ptr<Material> material);
 	void setVertex(VertexUVData vertex);
-	void setUpdateFun(UpdateFunction update);
-	void setUpdateCamera(UpdateUniform update);
 
 	Material* getMaterial() { return m_material.get(); }
 
-	void render(double dt) override;
-	void tick(double dt) override;
-	void cameraChange(ICamera* camera) override;
-
-	void setWorld(Eigen::Matrix4f& world);
-	void setCamera(ICamera* camera) override;
-
+	void render(Camera* camera);
+	void cameraRender(CameraChangeFunction op);
 
 protected:
 	D3D11Context* m_context;
 	IDrawer* m_drawer;
-
-	Eigen::Matrix4f m_world;
-	ICamera* m_camera;
+	CameraChangeFunction m_cameraOp;
 private:
 	std::shared_ptr<Pipeline> m_pipeline;
 	std::shared_ptr<Material> m_material;
 	VertexUVData m_vertex;
-	bool m_needUpdateUniform;
-protected:
-	UpdateFunction m_update;
-	UpdateUniform m_cameraUpdate;
 
 };

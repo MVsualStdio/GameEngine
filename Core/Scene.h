@@ -9,14 +9,13 @@ public:
 	using RenderItem = std::unordered_map<std::string, std::shared_ptr<MeshRender>>;
 	Scene(D3D11Context* context, IDrawer* drawer);
 	~Scene();
-	void render(double dt) override;
+	//void render(double dt) override;
 
 	void addMeshRender(const std::string& name, std::shared_ptr<MeshRender> mesh);
 	std::shared_ptr<MeshRender> getRender(const std::string& name);
 	const RenderItem& getAllRenderItems();
 	void setDrawer(IDrawer* drawer);
 
-	void setCamera(ICamera* camera) override;
 
 private:
 	D3D11Context* m_context;

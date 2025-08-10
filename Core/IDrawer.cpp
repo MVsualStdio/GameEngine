@@ -1,25 +1,20 @@
 #include "IDrawer.h"
+#include "MeshRender.h"
 
 IDrawer::IDrawer(D3D11Context* context)
 	: m_context(context) {
 }
 
-void IDrawer::addItem(std::shared_ptr<IRenderObject> item) {
-	m_items.push_back(std::move(item));
+void IDrawer::addItem(MeshRender* item) {
+	m_items.push_back(item);
 }
 
-void IDrawer::renderForeach(double dt) {
-	for (auto& item = m_items.begin(); item != m_items.end(); ++item) {
-		(*item)->render(dt);
+void IDrawer::onDraw(Camera* camera) {
+	for (auto item = m_items.begin(); item != m_items.end(); ++item) {
+		(*item)->render(camera);
 	}
 }
 
-void IDrawer::updateCamera(ICamera* camera) {
-	for (auto& item = m_items.begin(); item != m_items.end(); ++item) {
-		(*item)->setCamera(camera);
-	}
-}
-
-std::vector<std::shared_ptr<IRenderObject>> IDrawer::getAllItems() {
+std::vector<MeshRender*> IDrawer::getAllItems() {
 	return m_items;
 }

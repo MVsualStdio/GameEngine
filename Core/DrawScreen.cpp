@@ -13,10 +13,6 @@ void DrawScreen::present() {
 	m_context->Present();
 }
 
-void DrawScreen::onDraw(double dt) {
-	renderForeach(dt);
-}
-
 void DrawScreen::clear() {
 	m_context->resetRT();
 	m_context->ClearScreenRT();

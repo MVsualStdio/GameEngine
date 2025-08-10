@@ -11,7 +11,6 @@ public:
 	RenderPass(D3D11Context* context);
 
 	void present() override;
-	void onDraw(double dt) override;
 	void clear() override;
 
 	ComPtr<ID3D11RenderTargetView> getRenderTarget() override;

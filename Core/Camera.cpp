@@ -1,72 +1,69 @@
 #include "Camera.h"
+#include "Component/GameObject.h"
+#include "Component/Transform.h"
+#include <rttr/registration>
 
-
-const Eigen::Matrix4f NoCamera::view() {
-    return Eigen::Matrix4f::Identity();
+RTTR_REGISTRATION
+{
+    rttr::registration::class_<Camera>("Camera")
+            .constructor<>()(rttr::policy::ctor::as_raw_ptr);
 }
 
-const Eigen::Matrix4f NoCamera::projection() {
-    return Eigen::Matrix4f::Identity();
+std::vector<Camera*> Camera::gAllcamera;
+
+std::vector<Camera*> Camera::CameraList() {
+    return gAllcamera;
 }
 
-void NoCamera::move(const Eigen::Vector3f& offset) {
-
+Camera::Camera() {
+    gAllcamera.push_back(this);
+    m_render = true;
 }
 
-void NoCamera::forward(float step) {
+void Camera::setProjection(Eigen::Vector3f target, float aspectRatio,
+    float fov, float zNear, float zFar) {
+    m_target = target;
+    m_aspectRatio = aspectRatio;
+    m_fov = fov;
+    m_zNear = zNear;
+    m_zFar = zFar;
+    m_viewDirty = true;
+    m_y = Eigen::Vector3f(0, 1, 0);
 
-}
+    Transform* transform = dynamic_cast<Transform*>(gameObject()->getComponent("Transform"));
+    if (!transform) {
+        return;
+    }
 
-void NoCamera::right(float step) {
-
-}
-
-void NoCamera::rotate(float yaw, float pitch) {
-
-}
-
-
-const Eigen::Vector3f NoCamera::position() {
-    return Eigen::Vector3f();
-}
-
-ProjectionCamera::ProjectionCamera(Eigen::Vector3f position, Eigen::Vector3f target, float aspectRatio,
-    float fov, float zNear, float zFar)
-    : m_position(position)
-    , m_target(target)
-    , m_aspectRatio(aspectRatio)
-    , m_fov(fov)
-    , m_zNear(zNear)
-    , m_zFar(zFar)
-    , m_viewDirty(true)
-    , m_y(Eigen::Vector3f(0,1,0)) {
-
-    m_front = (m_position - m_target).normalized();
-    m_right = m_front.cross(m_y).normalized();
-    m_up = m_right.cross(m_front).normalized();
-
+    m_front = (m_target - transform->getPosition()).normalized();
+    updateCoord();
     updateViewMatrix();
     updateProjectionMatrix();
 }
 
-const Eigen::Matrix4f ProjectionCamera::view() {
+void Camera::updateCoord() {
+    m_right = -m_front.cross(m_y).normalized();
+    m_up = -m_right.cross(m_front).normalized();
+    m_viewDirty = true;
+}
+
+const Eigen::Matrix4f Camera::view() {
     updateViewMatrix();
     return m_view;
 }
 
-const Eigen::Matrix4f ProjectionCamera::projection() {
+const Eigen::Matrix4f Camera::projection() {
     return m_projection;
 }
 
-const Eigen::Vector3f ProjectionCamera::position() {
-    return m_position;
-}
-
-void ProjectionCamera::updateViewMatrix()
+void Camera::updateViewMatrix()
 {
-    if (m_viewDirty) {
+     {
         m_view = Eigen::Matrix4f::Identity();
 
+        Transform* transform = dynamic_cast<Transform*>(gameObject()->getComponent("Transform"));
+        Eigen::Vector3f position = transform->getPosition();
+     
         Eigen::Vector3f f = m_front;
         Eigen::Vector3f s = m_right;
         Eigen::Vector3f u = m_up;
@@ -77,28 +74,21 @@ void ProjectionCamera::updateViewMatrix()
         m_view(1, 0) = u.x();
         m_view(1, 1) = u.y();
         m_view(1, 2) = u.z();
-        m_view(2, 0) = -f.x();
-        m_view(2, 1) = -f.y();
-        m_view(2, 2) = -f.z();
+        m_view(2, 0) = f.x();
+        m_view(2, 1) = f.y();
+        m_view(2, 2) = f.z();
 
-        m_view(3, 0) = -s.dot(m_position);
-        m_view(3, 1) = -u.dot(m_position);
-        m_view(3, 2) = f.dot(m_position);
+        m_view(0, 3) = -s.dot(position);
+        m_view(1, 3) = -u.dot(position);
+        m_view(2, 3) = -f.dot(position);
 
-        
+        m_view.transposeInPlace();
 
-        //DirectX::XMMATRIX dxView = DirectX::XMMatrixLookAtLH(
-        //    DirectX::XMVectorSet(m_position.x(), m_position.y(), m_position.z(), 0.0f),
-        //    DirectX::XMVectorSet(m_target.x(), m_target.y(), m_target.z(), 0.0f),
-        //    DirectX::XMVectorSet(m_y.x(), m_y.y(), m_y.z(), 0.0f)
-        //);
-        //copy(m_view, dxView);
         m_viewDirty = false;
     }
 }
 
-
-void ProjectionCamera::updateProjectionMatrix() {
+void Camera::updateProjectionMatrix() {
     float angle = m_fov * M_PI / 180.0f;
 
     float tanHalfFovy = tan(angle / 2.0f);
@@ -109,12 +99,9 @@ void ProjectionCamera::updateProjectionMatrix() {
     m_projection(2, 2) = (m_zFar + m_zNear) / (m_zFar - m_zNear);
     m_projection(3, 2) = -1.0f;
     m_projection(2, 3) = (m_zFar * m_zNear) / (m_zFar - m_zNear);
-
-    //DirectX::XMMATRIX dxPro = DirectX::XMMatrixPerspectiveFovLH(angle, m_aspectRatio, m_zNear, m_zFar);
-    //copy(m_projection, dxPro);
 }
 
-void ProjectionCamera::copy(Eigen::Matrix4f& mat, DirectX::XMMATRIX& dxMat) {
+void Camera::copy(Eigen::Matrix4f& mat, DirectX::XMMATRIX& dxMat) {
     DirectX::XMFLOAT4X4 dxFloat4x4;
     DirectX::XMStoreFloat4x4(&dxFloat4x4, dxMat);
     for (int i = 0; i < 4; ++i) {
@@ -122,43 +109,4 @@ void ProjectionCamera::copy(Eigen::Matrix4f& mat, DirectX::XMMATRIX& dxMat) {
             mat(i, j) = dxFloat4x4.m[i][j];
         }
     }
-}
-
-void ProjectionCamera::move(const Eigen::Vector3f& offset) {
-    m_position += offset;
-    m_viewDirty = true;
-}
-
-void ProjectionCamera::forward(float step) {
-    m_position = m_position - m_front * step;
-    m_right = m_front.cross(m_y).normalized();
-    m_up = m_right.cross(m_front).normalized();
-    m_viewDirty = true;
-}
-
-void ProjectionCamera::right(float step) {
-    m_position = m_position - m_right * step;
-    m_right = m_front.cross(m_y).normalized();
-    m_up = m_right.cross(m_front).normalized();
-    m_viewDirty = true;
-}
-
-void ProjectionCamera::rotate(float yaw, float pitch) {
-    //pitch = std::clamp(pitch, -89.0f, 89.0f);
-    //yaw = std::clamp(yaw, -89.0f, 89.0f);
-
-    float yawRad = yaw * M_PI / 180.0f;
-    float pitchRad = pitch * M_PI / 180.0f;
-
-    // 使用四元数组合旋转
-    Eigen::Quaternionf qYaw(Eigen::AngleAxisf(yawRad, m_up));
-    Eigen::Quaternionf qPitch(Eigen::AngleAxisf(pitchRad, m_right));
-    Eigen::Quaternionf totalRot = qYaw * qPitch;
-
-    // 应用旋转到方向向量
-    m_front = totalRot * m_front;
-    m_right = m_front.cross(m_y).normalized(); // 使用固定的世界 "上" 向量
-    m_up = m_right.cross(m_front).normalized();
-
-    m_viewDirty = true;
 }

@@ -2,50 +2,39 @@
 #include "Eigen/Core"
 #include "Eigen/Dense"
 #include <DirectXMath.h>
+#include "Component/Component.h"
 
-class ICamera {
+class IDrawer;
+class Camera : public Component{
 public:
-	ICamera() = default;
+	Camera();
+	virtual ~Camera() = default;
 
-	virtual const Eigen::Matrix4f view() = 0;
-	virtual const Eigen::Matrix4f projection() = 0;
+	void setProjection(Eigen::Vector3f target, float aspectRatio = 16.0f / 9.0f,
+		float fov = 45.0f, float zNear = 1.0f, float zFar = 1000.0f);
 
-	virtual const Eigen::Vector3f position() = 0;
+	void setCullMask(unsigned char cullingMask) { m_cullingMask = cullingMask; }
+	unsigned char getCullMask() { return m_cullingMask; }
 
-	virtual void move(const Eigen::Vector3f& offset) = 0;
-	virtual void right(float step) = 0;
-	virtual void forward(float step) = 0;
+	void setRenderPass(IDrawer* drawer) { m_drawer = drawer; }
+	IDrawer* getRenderPass() { return m_drawer; }
 
-	virtual void rotate(float yaw, float pitch) = 0;
-};
+	void setRender(bool needRender) { m_render = needRender; }
+	bool needRender() { return m_render; }
 
-class NoCamera : public ICamera {
-public:
-	NoCamera() = default;
-	const Eigen::Matrix4f view() override;
-	const Eigen::Matrix4f projection() override;
-	const Eigen::Vector3f position() override;
-	void move(const Eigen::Vector3f& offset) override;
-	void forward(float step) override;
-	void right(float step) override;
-	void rotate(float yaw, float pitch) override;
-};
+	static std::vector<Camera*> CameraList();
 
-class ProjectionCamera : public ICamera {
-public:
-	ProjectionCamera(Eigen::Vector3f position, Eigen::Vector3f target, float aspectRatio = 16.0f / 9.0f,
-					float fov = 45.0f, float zNear = 1.0f, float zFar = 1000.0f);
-	~ProjectionCamera() = default;
-	const Eigen::Matrix4f view() override;
-	const Eigen::Matrix4f projection() override;
-	const Eigen::Vector3f position() override;
-	void updateViewMatrix();
-	void updateProjectionMatrix();
-	void move(const Eigen::Vector3f& offset) override;
-	void forward(float step) override;
-	void right(float step) override;
+	const Eigen::Matrix4f view();
+	const Eigen::Matrix4f projection();
 
-	void rotate(float yaw, float pitch) override;
+	Eigen::Vector3f front() { return m_front; }
+	Eigen::Vector3f right() { return m_right; }
+	Eigen::Vector3f up() { return m_up; }
+	void setFront(Eigen::Vector3f front) {  
+		m_front = front; 
+		updateCoord();
+	}
+
 private:
 	float m_fov;
 	float m_aspectRatio;
@@ -53,7 +42,6 @@ private:
 	float m_zFar;
 	const double M_PI = 3.14159265358979323846;
 
-	Eigen::Vector3f m_position;
 	Eigen::Vector3f m_front;
 	Eigen::Vector3f m_right;
 	Eigen::Vector3f m_y;
@@ -64,5 +52,17 @@ private:
 	Eigen::Matrix4f m_view;
 	Eigen::Matrix4f m_projection;
 
+	unsigned char m_cullingMask;
+	IDrawer* m_drawer;
+	bool m_render;
+
 	void copy(Eigen::Matrix4f& mat, DirectX::XMMATRIX& dirMat);
+	void updateCoord();
+	void updateViewMatrix();
+	void updateProjectionMatrix();
+
+	static std::vector<Camera*> gAllcamera;
+
 };
+
+

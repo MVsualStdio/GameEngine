@@ -15,11 +15,9 @@ Scene::~Scene() {
 
 }
 
-void Scene::render(double dt) {
-	for (const auto& [name, mesh] : m_renderItems) {
-		mesh->render(dt);
-	}
-}
+//void Scene::render(double dt) {
+//
+//}
 
 void Scene::addMeshRender(const std::string& name, std::shared_ptr<MeshRender> mesh) {
 	m_renderItems[name] = mesh;
@@ -40,8 +38,3 @@ void Scene::setDrawer(IDrawer* drawer) {
 	m_drawer = drawer;
 }
 
-void Scene::setCamera(ICamera* camera) {
-	for (const auto& [name, mesh] : m_renderItems) {
-		mesh->setCamera(camera);
-	}
-}

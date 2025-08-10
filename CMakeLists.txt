@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(engine)
 set(CMAKE_CXX_STANDARD 17)
-include(E:/LearnSomething/vcpkg/scripts/buildsystems/vcpkg.cmake)
+include(D:/work/vcpkg/scripts/buildsystems/vcpkg.cmake)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -27,12 +27,17 @@ set(CoreFiles
     Core/CBuffer.h Core/CBuffer.cpp
     Core/Shader.h Core/Shader.cpp
     Core/MeshFilter.h Core/MeshFilter.cpp
-    Core/Scene.h Core/Scene.cpp
     Core/Vertex.h
     Core/Camera.h Core/Camera.cpp
     Core/DDSTextureLoader11.h Core/DDSTextureLoader11.cpp
     Core/RenderPass.h Core/RenderPass.cpp
-    Core/CameraManager.h Core/CameraManager.cpp
+    Core/InputControl.h Core/InputControl.cpp
+)
+
+set(ComponentFiles
+    Core/Component/Component.h Core/Component/Component.cpp
+    Core/Component/GameObject.h Core/Component/GameObject.cpp
+    Core/Component/Transform.h Core/Component/Transform.cpp
 )
 
 set(ShellFiles     
@@ -53,6 +58,7 @@ source_group("Core Files" FILES ${CoreFiles})
 source_group("Shell Files" FILES  ${ShellFiles})
 source_group("Window Files" FILES ${WindowFiles})
 source_group("HLSL Files" FILES ${ResourceFiles})
+source_group("Component Files" FILES ${ComponentFiles})
 
 add_executable(engineMain
     main.cpp
@@ -60,6 +66,7 @@ add_executable(engineMain
     ${ShellFiles}
     ${WindowFiles}
     ${ResourceFiles}
+    ${ComponentFiles}
 )
 
 
