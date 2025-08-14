@@ -97,8 +97,8 @@ void Camera::updateProjectionMatrix() {
     m_projection(0, 0) = 1.0f / (m_aspectRatio * tanHalfFovy);
     m_projection(1, 1) = 1.0f / tanHalfFovy;
     m_projection(2, 2) = (m_zFar + m_zNear) / (m_zFar - m_zNear);
-    m_projection(3, 2) = -1.0f;
-    m_projection(2, 3) = (m_zFar * m_zNear) / (m_zFar - m_zNear);
+    m_projection(2, 3) = 1.0f;
+    m_projection(3, 2) = -(m_zFar * m_zNear) / (m_zFar - m_zNear);
 }
 
 void Camera::copy(Eigen::Matrix4f& mat, DirectX::XMMATRIX& dxMat) {

@@ -6,6 +6,6 @@
 
 class Geometry {
 public:
-	static VertexUVData CreateTrangle(Eigen::Vector3f points[3]);
-	static VertexUVData CreateCube(float width, float height, float depth);
+	static std::shared_ptr<AnyVertexBuffer> CreateCube(float width, float height, float depth);
+	static std::shared_ptr<AnyVertexBuffer> CreateTrangle(Eigen::Vector3f points[3]);
 };

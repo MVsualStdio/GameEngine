@@ -1,13 +1,13 @@
 #include "Pipeline.h"
 #include "MeshFilter.h"
 
-Pipeline::Pipeline(D3D11Context* context, Material* material, VertexUVData* vertex, IDrawer* drawer)
+Pipeline::Pipeline(D3D11Context* context, Material* material, AnyVertexBuffer* vertex, IDrawer* drawer)
 	: m_context(context)
 	, m_material(material)
 	, m_drawer(drawer)
 	, m_vertex(vertex) {
 
-	m_context->m_Device->CreateInputLayout(vertex->layout(), vertex->layoutSize(),
+	m_context->m_Device->CreateInputLayout(vertex->layout(), vertex->layoutCount(),
 		material->getVSShader()->getBlob()->GetBufferPointer(), 
 		material->getVSShader()->getBlob()->GetBufferSize(), &pInputLayout);
 
@@ -17,13 +17,13 @@ Pipeline::Pipeline(D3D11Context* context, Material* material, VertexUVData* vert
 		0);
 
 	D3D11_SUBRESOURCE_DATA initData{ nullptr, 0, 0 };
-	bufferDesc.ByteWidth = vertex->dataSize();
-	initData.pSysMem = vertex->ptrData();
+	bufferDesc.ByteWidth = vertex->vertexCount();
+	initData.pSysMem = vertex->vertexData();
 	m_context->m_Device->CreateBuffer(&bufferDesc, &initData, pVertexBuffers.GetAddressOf());
 
-	bufferDesc.ByteWidth = vertex->indexSize();
+	bufferDesc.ByteWidth = vertex->indexCount();
 	bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	initData.pSysMem = vertex->ptrIndex();
+	initData.pSysMem = vertex->indexData();
 	m_context->m_Device->CreateBuffer(&bufferDesc, &initData, pIndexBuffer.GetAddressOf());
 
 	D3D11_SAMPLER_DESC sampDesc;
@@ -39,7 +39,7 @@ Pipeline::Pipeline(D3D11Context* context, Material* material, VertexUVData* vert
 }
 
 void Pipeline::IA() {
-	UINT size = m_vertex->itemSize();
+	UINT size = m_vertex->vertexSize();
 	UINT offset = 0;
 	m_context->m_DeviceContext->IASetVertexBuffers(0, 1, pVertexBuffers.GetAddressOf(), &size, &offset);
 	m_context->m_DeviceContext->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
@@ -85,5 +85,5 @@ void Pipeline::OM() {
 }
 
 void Pipeline::DrawIndex() {
-	m_context->m_DeviceContext->DrawIndexed(m_vertex->index.size(), 0, 0);
+	m_context->m_DeviceContext->DrawIndexed(m_vertex->indexSize(), 0, 0);
 }

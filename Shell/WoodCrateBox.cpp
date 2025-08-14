@@ -94,7 +94,6 @@ void WoodCrateBox::update(double dt) {
 		float yawRad = dM[0] * M_PI / 180.0f;
 		float pitchRad = dM[1] * M_PI / 180.0f;
 
-		// ʹ����Ԫ�������ת
 		Eigen::Quaternionf qYaw(Eigen::AngleAxisf(yawRad, m_camera->up()));
 		Eigen::Quaternionf qPitch(Eigen::AngleAxisf(pitchRad, m_camera->right()));
 		Eigen::Quaternionf totalRot = qYaw * qPitch;

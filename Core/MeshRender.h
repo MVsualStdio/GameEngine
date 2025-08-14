@@ -15,13 +15,12 @@ public:
 
 	IDrawer* getPass() { return m_drawer; }
 	void setMaterial(std::shared_ptr<Material> material);
-	void setVertex(VertexUVData vertex);
-
 	Material* getMaterial() { return m_material.get(); }
+
+	void setVertex(std::shared_ptr<AnyVertexBuffer> vertex);
 
 	void render(Camera* camera);
 	void cameraRender(CameraChangeFunction op);
-
 protected:
 	D3D11Context* m_context;
 	IDrawer* m_drawer;
@@ -29,6 +28,7 @@ protected:
 private:
 	std::shared_ptr<Pipeline> m_pipeline;
 	std::shared_ptr<Material> m_material;
-	VertexUVData m_vertex;
-
+	std::shared_ptr<AnyVertexBuffer> m_vertex;
+protected:
+	virtual void initPipeline();
 };

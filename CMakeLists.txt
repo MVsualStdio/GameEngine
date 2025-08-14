@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(engine)
 set(CMAKE_CXX_STANDARD 17)
-include(D:/work/vcpkg/scripts/buildsystems/vcpkg.cmake)
+include(E:/LearnSomething/vcpkg/scripts/buildsystems/vcpkg.cmake)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -28,10 +28,12 @@ set(CoreFiles
     Core/Shader.h Core/Shader.cpp
     Core/MeshFilter.h Core/MeshFilter.cpp
     Core/Vertex.h
+    Core/VertexLayout.h
     Core/Camera.h Core/Camera.cpp
     Core/DDSTextureLoader11.h Core/DDSTextureLoader11.cpp
     Core/RenderPass.h Core/RenderPass.cpp
     Core/InputControl.h Core/InputControl.cpp
+    
 )
 
 set(ComponentFiles
@@ -52,6 +54,7 @@ set(WindowFiles
 set(ResourceFiles
     HLSL/baseVS.hlsli HLSL/basePS.hlsli
     HLSL/woodCrateBox.hlsli
+    HLSL/woodCrateBoxLight.hlsli
 )
 
 source_group("Core Files" FILES ${CoreFiles})

@@ -27,9 +27,14 @@ void MeshRender::cameraRender(MeshRender::CameraChangeFunction op) {
 	m_cameraOp = op;
 }
 
+void MeshRender::initPipeline() {
+	m_pipeline = std::make_shared<Pipeline>(m_context, m_material.get(), m_vertex.get(), m_drawer);
+}
+
 void MeshRender::render(Camera* camera) {
-	m_pipeline = std::make_shared<Pipeline>(m_context, m_material.get(), &m_vertex, m_drawer);
-	
+	if (!m_pipeline) {
+		initPipeline();
+	}
 	if (gameObject()->getLayer() & camera->getCullMask() == 0) {
 		return;
 	}
@@ -50,6 +55,7 @@ void MeshRender::setMaterial(std::shared_ptr<Material> material) {
 	m_material = material;
 }
 
-void MeshRender::setVertex(VertexUVData vertex) {
+
+void MeshRender::setVertex(std::shared_ptr<AnyVertexBuffer> vertex) {
 	m_vertex = vertex;
 }
