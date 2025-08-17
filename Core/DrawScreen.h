@@ -10,5 +10,6 @@ public:
 	void present() override;
 	void clear() override;
 
-	ComPtr<ID3D11RenderTargetView> getRenderTarget() override;
+	Texture2D* getRenderTarget() override;
+	Depth2D* getDepthStencil() override;
 };

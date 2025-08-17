@@ -5,8 +5,12 @@
 
 }
 
-ComPtr<ID3D11RenderTargetView> DrawScreen::getRenderTarget() {
+Texture2D* DrawScreen::getRenderTarget() {
 	return m_context->getScreenRT();
+}
+
+Depth2D* DrawScreen::getDepthStencil() {
+	return m_context->getScreenDepth();
 }
 
 void DrawScreen::present() {
@@ -16,4 +20,5 @@ void DrawScreen::present() {
 void DrawScreen::clear() {
 	m_context->resetRT();
 	m_context->ClearScreenRT();
+	m_context->ClearScreenDepth();
 }

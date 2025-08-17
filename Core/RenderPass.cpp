@@ -7,16 +7,17 @@
 
 RenderPass::RenderPass(D3D11Context* context) 
 	: IDrawer(context)
-	, m_texture(std::make_shared<Texture2D>(m_context, m_context->width(), m_context->height())) {
+	, m_texture(std::make_shared<Texture2D>(m_context, m_context->width(), m_context->height())) 
+	, m_depth(std::make_shared<Depth2D>(m_context, m_context->width(), m_context->height())){
 
 }
 
-ComPtr<ID3D11RenderTargetView> RenderPass::getRenderTarget() {
-	return m_texture->GetRenderTarget();
-}
-
-Texture2D* RenderPass::getResult() {
+Texture2D* RenderPass::getRenderTarget() {
 	return m_texture.get();
+}
+
+Depth2D* RenderPass::getDepthStencil() {
+	return m_depth.get();
 }
 
 void RenderPass::present() {
@@ -25,5 +26,6 @@ void RenderPass::present() {
 
 void RenderPass::clear() {
 	m_context->resetRT();
-	m_context->ClearScreenRT();
+	m_context->ClearRT(m_texture->GetRenderTarget().Get());
+	m_context->ClearDepth(m_depth->GetDepthStencil().Get());
 }

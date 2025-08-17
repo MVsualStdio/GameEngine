@@ -81,7 +81,9 @@ void Pipeline::PS() {
 }
 
 void Pipeline::OM() {
-	m_context->m_DeviceContext->OMSetRenderTargets(1, m_drawer->getRenderTarget().GetAddressOf(), nullptr);
+	m_context->m_DeviceContext->OMSetRenderTargets(1, 
+		m_drawer->getRenderTarget()->GetRenderTarget().GetAddressOf(), 
+		m_drawer->getDepthStencil()->GetDepthStencil().Get());
 }
 
 void Pipeline::DrawIndex() {

@@ -2,7 +2,7 @@
 #include <QtWidgets/QApplication>
 #include "Core/Scene.h"
 #include "Shell/DrawScreenManager.h"
-#include "Shell/WoodCrateBox.h"
+#include "Shell/XWoodCrateBox.h"
 #include "Core/Component/GameObject.h"
 
 void init() {

@@ -60,3 +60,7 @@ std::vector<Component*>& GameObject::getComponents(std::string componentName) {
 	return m_componentInstance[componentName];
 
 }
+
+void GameObject::update(double dt) {
+
+}

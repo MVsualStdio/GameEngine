@@ -1,11 +1,11 @@
 #include "DrawScreenManager.h"
 #include "../Core/DDSTextureLoader11.h"
 #include <Eigen/Geometry>
-#include "WoodCrateBox.h"
 #include "../Core/MeshFilter.h"
 #include "../Core/Component/GameObject.h"
-#include "../Core/Component/Transform.h"
-
+#include "XCameraObject.h"
+#include "XWoodCrateBox.h"
+#include "XPlane.h"
 DrawMangerScreen::DrawMangerScreen() {
 
 }
@@ -54,7 +54,18 @@ void DrawMangerScreen::initCompent() {
 
 	m_drawScreen = new DrawScreen(m_context.get());
 
-	GameObject* boxObj = new GameObject("boxObj");
-	WoodCrateBox* box =  dynamic_cast<WoodCrateBox*>(boxObj->addComponent("WoodCrateBox"));
-	box->init(m_drawScreen, m_context.get(), m_Tranglepass->getResult());
+	ID3D11ShaderResourceView* textureView;
+	DirectX::CreateDDSTextureFromFile(m_context->m_Device.Get(), L"D:/work/GameEngine/HLSL/floor.dds", nullptr, &textureView);
+	Texture2D floor(m_context.get(), textureView);
+
+	XPlane* plane = new XPlane();
+	plane->init(m_drawScreen, m_context.get(), &floor);
+
+	XWoodCrateBox* box = new XWoodCrateBox();
+	box->init(m_drawScreen, m_context.get(), m_Tranglepass->getRenderTarget());
+
+	XCameraObject* camera = new XCameraObject();
+	camera->init(m_drawScreen, m_context.get());
+
+
 }

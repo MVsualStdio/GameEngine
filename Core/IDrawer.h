@@ -35,7 +35,8 @@ public:
 	virtual void clear() = 0;
 
 	void addItem(MeshRender* item);
-	virtual ComPtr<ID3D11RenderTargetView> getRenderTarget() = 0;
+	virtual Texture2D* getRenderTarget() = 0;
+	virtual Depth2D* getDepthStencil() = 0;
 	std::vector<MeshRender*> getAllItems();
 protected:
 	std::vector<MeshRender*> m_items;

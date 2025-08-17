@@ -20,6 +20,9 @@ void DrawMangerBase::present(double dt) {
 	for (auto component : Component::getAllComponents()) {
 		component->update(dt);
 	}
+	for (auto gameObject : GameObject::getALLGameObject()) {
+		gameObject->update(dt);
+	}
 	for (IDrawer* drawer : m_drawList) {
 		drawer->clear();
 		for (auto camera : Camera::CameraList()) {

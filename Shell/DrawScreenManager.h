@@ -1,8 +1,6 @@
 #pragma once
 
 #include "../Core/DrawManger.h"
-#include "../Core/MeshRender.h"
-#include "../Core/Scene.h"
 #include "../Core/DrawScreen.h"
 #include "../Core/RenderPass.h"
 
@@ -12,12 +10,10 @@ public:
 private:
 	void initCompent() override;
 protected:
-	void initCamera();
 	void initScene();
 	void initTranglePass();
 private:
 	double m_time = 0.0;
-	std::shared_ptr<Scene> m_scene;
 	DrawScreen* m_drawScreen;
 	RenderPass* m_Tranglepass;
 };

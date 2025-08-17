@@ -44,7 +44,9 @@ set(ComponentFiles
 
 set(ShellFiles     
     Shell/DrawScreenManager.h Shell/DrawScreenManager.cpp
-    Shell/WoodCrateBox.h Shell/WoodCrateBox.cpp
+    Shell/XWoodCrateBox.h Shell/XWoodCrateBox.cpp
+    Shell/XCameraObject.h Shell/XCameraObject.cpp
+    Shell/XPlane.h Shell/XPlane.cpp
 )
 
 set(WindowFiles

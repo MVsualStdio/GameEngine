@@ -8,7 +8,7 @@ class GameObject {
 public:
     GameObject();
     GameObject(std::string name);
-    ~GameObject();
+    virtual ~GameObject();
     std::string& name();
     void setName(std::string name);
     Component* addComponent(std::string componentName);
@@ -19,6 +19,8 @@ public:
     unsigned char getLayer() { return m_layer; }
 
     static std::list<GameObject*> getALLGameObject();
+
+    virtual void update(double dt);
 
 private:
     unsigned char m_layer;

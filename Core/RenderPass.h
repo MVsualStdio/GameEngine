@@ -13,8 +13,9 @@ public:
 	void present() override;
 	void clear() override;
 
-	ComPtr<ID3D11RenderTargetView> getRenderTarget() override;
-	Texture2D* getResult();
+	Texture2D* getRenderTarget() override;
+	Depth2D* getDepthStencil() override;
 private:
 	std::shared_ptr<Texture2D> m_texture;
+	std::shared_ptr<Depth2D> m_depth;
 };

@@ -19,15 +19,20 @@ Transform::Transform()
 
 Eigen::Matrix4f Transform::getMatrix() {
 
-	Eigen::Matrix4f world = Eigen::Matrix4f::Identity();
-	//world.block<3, 3>(0, 0) = Eigen::AngleAxisf(m_rotate).toRotationMatrix();
-	
-	world(0, 0) *= m_scale.x();
-	world(1, 1) *= m_scale.y();
-	world(2, 2) *= m_scale.z();
-	world(3, 0) = m_position.x();
-	world(3, 1) = m_position.y();
-	world(3, 2) = m_position.z();
+    Eigen::Matrix4f matrix = Eigen::Matrix4f::Identity();
 
-	return world;
+    // Apply translation
+    matrix.block<3, 1>(0, 3) = m_position;
+
+    // Apply rotation (as Euler angles in radians, XYZ order)
+    Eigen::Matrix3f rotation;
+    rotation = Eigen::AngleAxisf(m_rotate.x(), Eigen::Vector3f::UnitX())
+        * Eigen::AngleAxisf(m_rotate.y(), Eigen::Vector3f::UnitY())
+        * Eigen::AngleAxisf(m_rotate.z(), Eigen::Vector3f::UnitZ());
+    matrix.block<3, 3>(0, 0) = rotation;
+
+    // Apply scale
+    matrix.block<3, 3>(0, 0) *= m_scale.asDiagonal();
+
+	return matrix.transpose();
 }

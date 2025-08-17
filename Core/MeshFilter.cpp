@@ -95,11 +95,41 @@ std::shared_ptr<AnyVertexBuffer> Geometry::CreateCube(float width, float height,
 
     pVertex->indices = {
         0, 1, 2, 2, 3, 0,		// 右面(+X面)
-        4, 5, 6, 6, 7, 4,		// 左面(-X面)
+        6, 5, 4, 4, 7, 6,		// 左面(-X面)
         8, 9, 10, 10, 11, 8,	// 顶面(+Y面)
         12, 13, 14, 14, 15, 12,	// 底面(-Y面)
         16, 17, 18, 18, 19, 16, // 背面(+Z面)
         20, 21, 22, 22, 23, 20	// 正面(-Z面)
     };
+    return std::make_shared<AnyVertexBuffer>(pVertex);
+}
+
+std::shared_ptr<AnyVertexBuffer> Geometry::CreatePlane(float width, float depth, float texU, float texV) {
+    std::shared_ptr<VertexBuffer<VertexUV>> pVertex = std::make_shared<VertexUVData>();
+    pVertex->vertices.resize(4);
+
+    uint32_t vIndex = 0;
+    pVertex->vertices[vIndex].pos = Eigen::Vector3<float>(-width / 2, 0.0f, -depth / 2);
+    pVertex->vertices[vIndex].normal = Eigen::Vector3<float>(0.0f, 1.0f, 0.0f);
+    pVertex->vertices[vIndex].color = Eigen::Vector4<float>(1.0f, 0.0f, 0.0f, 1.0f);
+    pVertex->vertices[vIndex++].uv = Eigen::Vector2<float>(0.0f, texV);
+
+    pVertex->vertices[vIndex].pos = Eigen::Vector3<float>(-width / 2, 0.0f, depth / 2);
+    pVertex->vertices[vIndex].normal = Eigen::Vector3<float>(0.0f, 1.0f, 0.0f);
+    pVertex->vertices[vIndex].color = Eigen::Vector4<float>(1.0f, 0.0f, 0.0f, 1.0f);
+    pVertex->vertices[vIndex++].uv = Eigen::Vector2<float>(0.0f, 0.0f);
+
+    pVertex->vertices[vIndex].pos = Eigen::Vector3<float>(width / 2, 0.0f, depth / 2);
+    pVertex->vertices[vIndex].normal = Eigen::Vector3<float>(0.0f, 1.0f, 0.0f);
+    pVertex->vertices[vIndex].color = Eigen::Vector4<float>(1.0f, 0.0f, 0.0f, 1.0f);
+    pVertex->vertices[vIndex++].uv = Eigen::Vector2<float>(texU, 0.0f);
+
+    pVertex->vertices[vIndex].pos = Eigen::Vector3<float>(width / 2, 0.0f, -depth / 2);
+    pVertex->vertices[vIndex].normal = Eigen::Vector3<float>(0.0f, 1.0f, 0.0f);
+    pVertex->vertices[vIndex].color = Eigen::Vector4<float>(1.0f, 0.0f, 0.0f, 1.0f);
+    pVertex->vertices[vIndex++].uv = Eigen::Vector2<float>(texU, texV);
+
+    pVertex->indices = { 0, 1, 2, 2, 3, 0 };
+
     return std::make_shared<AnyVertexBuffer>(pVertex);
 }

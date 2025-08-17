@@ -1,5 +1,6 @@
 #include "D3D11Context.h"
 #include <cassert>
+#include "Texture.h"
 
 D3D11Context::D3D11Context(HWND windowHandle, uint32_t width, uint32_t height)
 {
@@ -32,7 +33,9 @@ float D3D11Context::AspectRatio()const
 
 void D3D11Context::OnResize(uint32_t width, uint32_t height)
 {
-    m_RenderTargetView.Reset();
+    m_RenderTarget->GetRenderTarget().Reset();
+    m_Depth->GetDepthStencil().Reset();
+    
     m_SwapChain->ResizeBuffers(0, width, height, DXGI_FORMAT_UNKNOWN, 0);
     CreateRenderTarget();
     CreateViewport(width, height);
@@ -40,6 +43,11 @@ void D3D11Context::OnResize(uint32_t width, uint32_t height)
 
 void D3D11Context::ClearRT(ID3D11RenderTargetView* pRenderTargetView) {
     m_DeviceContext->ClearRenderTargetView(pRenderTargetView, m_ClearColor);
+}
+
+void D3D11Context::ClearDepth(ID3D11DepthStencilView* pRenderTargetView, float Depth, UINT8 Stencil) {
+    m_DeviceContext->ClearDepthStencilView(pRenderTargetView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, Depth, Stencil);
+   
 }
 
 void D3D11Context::resetRT() {
@@ -50,7 +58,11 @@ void D3D11Context::resetRT() {
 
 void D3D11Context::ClearScreenRT()
 {
-    ClearRT(m_RenderTargetView.Get());
+    ClearRT(m_RenderTarget->GetRenderTarget().Get());
+}
+
+void D3D11Context::ClearScreenDepth(float Depth, UINT8 Stencil) {
+    ClearDepth(m_Depth->GetDepthStencil().Get(), Depth, Stencil);
 }
 
 void D3D11Context::SetClearColor(float r, float g, float b, float a)
@@ -123,11 +135,12 @@ void D3D11Context::CreateAdapter()
 
 void D3D11Context::CreateRenderTarget()
 {
-    ID3D11Texture2D* pBackBuffer;
+    ComPtr<ID3D11Texture2D> pBackBuffer;
+    ComPtr<ID3D11RenderTargetView> RenderTargetView;
     m_SwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
-    HRESULT hr = m_Device->CreateRenderTargetView(pBackBuffer, NULL, m_RenderTargetView.GetAddressOf());
-    assert(hr == S_OK);
-    pBackBuffer->Release();
+    m_RenderTarget = std::make_shared<Texture2D>(this, pBackBuffer.Get());
+
+    m_Depth = std::make_shared<Depth2D>(this, m_width, m_height);
 }
 
 void D3D11Context::CreateViewport(uint32_t width, uint32_t height)
@@ -141,10 +154,14 @@ void D3D11Context::CreateViewport(uint32_t width, uint32_t height)
     m_DeviceContext->RSSetViewports(1, &m_Viewport);
 }
 
-ComPtr<ID3D11RenderTargetView> D3D11Context::getScreenRT() {
-    return m_RenderTargetView;
+Texture2D* D3D11Context::getScreenRT() {
+    return m_RenderTarget.get();
+}
+
+Depth2D* D3D11Context::getScreenDepth() {
+    return m_Depth.get();
 }
 
 void D3D11Context::setOMScreenRT() {
-    m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), NULL);
+    m_DeviceContext->OMSetRenderTargets(1, m_RenderTarget->GetRenderTarget().GetAddressOf() , m_Depth->GetDepthStencil().Get());
 }
