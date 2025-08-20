@@ -46,6 +46,15 @@ Component* GameObject::addComponent(std::string componentName) {
 	return component;
 }
 
+Component* GameObject::addOnlyComponent(std::string componentName) {
+
+	Component* component = getComponent(componentName);
+	if (!component) {
+		component = addComponent(componentName);
+	}
+	return component;
+}
+
 Component* GameObject::getComponent(std::string componentName) {
 	if (m_componentInstance.find(componentName) == m_componentInstance.end()) {
 		return nullptr;

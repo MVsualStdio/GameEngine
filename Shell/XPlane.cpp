@@ -13,12 +13,13 @@ XPlane::~XPlane() {
 
 }
 
-void XPlane::init(IDrawer* drawer, D3D11Context* context, Texture2D* texture) {
-	m_render = dynamic_cast<MeshRender*>(addComponent("MeshRender"));
-	m_render->init(drawer, context);
+void XPlane::init(IDrawer* drawer, D3D11Context* context, Texture2D* texture, std::shared_ptr<AnyVertexBuffer> vertex) {
+	m_render = dynamic_cast<MeshRender*>(addOnlyComponent("MeshRender"));
+	m_transform = dynamic_cast<Transform*>(addOnlyComponent("Transform"));
+	m_light = dynamic_cast<XLightCpt*>(addOnlyComponent("XLight"));
 
-	m_transform = dynamic_cast<Transform*>(addComponent("Transform"));
-	m_transform->setPosition(Eigen::Vector3f(0.0f, -1.0f, 0.0f));
+	m_render->init(drawer, context);
+	
 	Eigen::Matrix4f world = m_transform->getMatrix();
 
 	Material* material = new Material(context);
@@ -28,12 +29,14 @@ void XPlane::init(IDrawer* drawer, D3D11Context* context, Texture2D* texture) {
 	material->getVSShader()->setUniform("g_World", world);
 	Eigen::Matrix4f worldInv = world.inverse().transpose();
 	material->getVSShader()->setUniform("g_WorldInvTranspose", worldInv);
-	material->getPSShader()->setUniform("lightPosition", Eigen::Vector3f{ 30.0f,30.0f,-40.0f });
-	material->getPSShader()->setUniform("lightColor", Eigen::Vector3f{ 1.0f,1.0f,1.0f });
+	material->getPSShader()->setUniform("lightPosition", m_light->getPosition());
+
+	Eigen::Vector3f color = Eigen::Vector3f{ m_light->getLightColor().x(),m_light->getLightColor().y(),m_light->getLightColor().z() };
+	material->getPSShader()->setUniform("lightColor", color);
 
 	material->getPSShader()->setTexture(0, *texture);
 	m_render->setMaterial(std::shared_ptr<Material>(material));
-	m_render->setVertex(Geometry::CreatePlane(20.0f, 20.0f, 5.0f, 5.0f));
+	m_render->setVertex(vertex);
 
 	m_render->cameraRender([](MeshRender* render, Camera* camera)->void {
 		render->getMaterial()->getVSShader()->setUniform("g_View", camera->view());

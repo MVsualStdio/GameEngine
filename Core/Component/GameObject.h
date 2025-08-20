@@ -12,6 +12,7 @@ public:
     std::string& name();
     void setName(std::string name);
     Component* addComponent(std::string componentName);
+    Component* addOnlyComponent(std::string componentName);
     Component* getComponent(std::string componentName);
     std::vector<Component*>& getComponents(std::string componentName);
 

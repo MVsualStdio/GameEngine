@@ -47,6 +47,8 @@ set(ShellFiles
     Shell/XWoodCrateBox.h Shell/XWoodCrateBox.cpp
     Shell/XCameraObject.h Shell/XCameraObject.cpp
     Shell/XPlane.h Shell/XPlane.cpp
+    Shell/XComponent/XLightCpt.h Shell/XComponent/XLightCpt.cpp
+    Shell/XLight.h Shell/XLight.cpp
 )
 
 set(WindowFiles
@@ -57,6 +59,8 @@ set(ResourceFiles
     HLSL/baseVS.hlsli HLSL/basePS.hlsli
     HLSL/woodCrateBox.hlsli
     HLSL/woodCrateBoxLight.hlsli
+    HLSL/floor.hlsli
+    HLSL/light.hlsli
 )
 
 source_group("Core Files" FILES ${CoreFiles})

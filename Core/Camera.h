@@ -13,6 +13,8 @@ public:
 	void setProjection(Eigen::Vector3f target, float aspectRatio = 16.0f / 9.0f,
 		float fov = 45.0f, float zNear = 1.0f, float zFar = 1000.0f);
 
+	void setOrtho(Eigen::Vector3f target, float width, float height, float zNear = 1.0f, float zFar = 1000.0f);
+
 	void setCullMask(unsigned char cullingMask) { m_cullingMask = cullingMask; }
 	unsigned char getCullMask() { return m_cullingMask; }
 
@@ -40,6 +42,10 @@ private:
 	float m_aspectRatio;
 	float m_zNear;
 	float m_zFar;
+
+	float m_width;
+	float m_height;
+
 	const double M_PI = 3.14159265358979323846;
 
 	Eigen::Vector3f m_front;
@@ -60,6 +66,7 @@ private:
 	void updateCoord();
 	void updateViewMatrix();
 	void updateProjectionMatrix();
+	void updateOrtho();
 
 	static std::vector<Camera*> gAllcamera;
 

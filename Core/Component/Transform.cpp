@@ -21,18 +21,18 @@ Eigen::Matrix4f Transform::getMatrix() {
 
     Eigen::Matrix4f matrix = Eigen::Matrix4f::Identity();
 
-    // Apply translation
-    matrix.block<3, 1>(0, 3) = m_position;
-
     // Apply rotation (as Euler angles in radians, XYZ order)
     Eigen::Matrix3f rotation;
     rotation = Eigen::AngleAxisf(m_rotate.x(), Eigen::Vector3f::UnitX())
-        * Eigen::AngleAxisf(m_rotate.y(), Eigen::Vector3f::UnitY())
-        * Eigen::AngleAxisf(m_rotate.z(), Eigen::Vector3f::UnitZ());
+        * Eigen::AngleAxisf(m_rotate.y(), Eigen::Vector3f::UnitZ())
+        * Eigen::AngleAxisf(m_rotate.z(), Eigen::Vector3f::UnitY());
     matrix.block<3, 3>(0, 0) = rotation;
 
     // Apply scale
     matrix.block<3, 3>(0, 0) *= m_scale.asDiagonal();
 
-	return matrix.transpose();
+    // Apply translation
+    matrix.block<3, 1>(0, 3) = m_position;
+
+    return matrix.transpose();
 }

@@ -15,15 +15,15 @@ XWoodCrateBox::XWoodCrateBox()
 void XWoodCrateBox::init(IDrawer* drawer, D3D11Context* context, Texture2D* texture) {
 	m_texture = texture;
 
-	Component* component = addComponent("MeshRender");
-	m_render = dynamic_cast<MeshRender*>(component);
+	m_render = dynamic_cast<MeshRender*>(addOnlyComponent("MeshRender"));
+	m_transform = dynamic_cast<Transform*>(addOnlyComponent("Transform"));
+	m_light = dynamic_cast<XLightCpt*>(addOnlyComponent("XLight"));
+
 	m_render->init(drawer, context);
 
 	ID3D11ShaderResourceView* textureView;
 	DirectX::CreateDDSTextureFromFile(context->m_Device.Get(), L"D:/work/GameEngine/HLSL/WoodCrate.dds", nullptr, &textureView);
 	Texture2D textureDDS(context, textureView);
-
-	m_transform = dynamic_cast<Transform*>(addComponent("Transform"));
 
 	Material* material = new Material(context);
 	material->setVSShader(L"D:/work/GameEngine/HLSL/woodCrateBoxLight.hlsli");
@@ -34,8 +34,10 @@ void XWoodCrateBox::init(IDrawer* drawer, D3D11Context* context, Texture2D* text
 	material->getVSShader()->setUniform("g_World", world);
 	Eigen::Matrix4f worldInv = world.inverse().transpose();
 	material->getVSShader()->setUniform("g_WorldInvTranspose", worldInv);
-	material->getPSShader()->setUniform("lightPosition", Eigen::Vector3f{ 30.0f,30.0f,-40.0f });
-	material->getPSShader()->setUniform("lightColor", Eigen::Vector3f{ 1.0f,1.0f,1.0f });
+	material->getPSShader()->setUniform("lightPosition", m_light->getPosition());
+
+	Eigen::Vector3f color = Eigen::Vector3f{ m_light->getLightColor().x(),m_light->getLightColor().y(),m_light->getLightColor().z() };
+	material->getPSShader()->setUniform("lightColor", color);
 
 	material->getPSShader()->setTexture(0, textureDDS);
 	material->getPSShader()->setTexture(1, *m_texture);

@@ -16,6 +16,8 @@ std::vector<Camera*> Camera::CameraList() {
 }
 
 Camera::Camera() {
+    m_viewDirty = true;
+    m_y = Eigen::Vector3f(0, 1, 0);
     gAllcamera.push_back(this);
     m_render = true;
 }
@@ -23,22 +25,39 @@ Camera::Camera() {
 void Camera::setProjection(Eigen::Vector3f target, float aspectRatio,
     float fov, float zNear, float zFar) {
     m_target = target;
-    m_aspectRatio = aspectRatio;
-    m_fov = fov;
     m_zNear = zNear;
     m_zFar = zFar;
-    m_viewDirty = true;
-    m_y = Eigen::Vector3f(0, 1, 0);
+
+    m_aspectRatio = aspectRatio;
+    m_fov = fov;
 
     Transform* transform = dynamic_cast<Transform*>(gameObject()->getComponent("Transform"));
     if (!transform) {
         return;
     }
-
     m_front = (m_target - transform->getPosition()).normalized();
     updateCoord();
     updateViewMatrix();
     updateProjectionMatrix();
+}
+
+
+void Camera::setOrtho(Eigen::Vector3f target, float width, float height, float zNear, float zFar) {
+    m_target = target;
+    m_zNear = zNear;
+    m_zFar = zFar;
+
+    m_width = width;
+    m_height = height;
+
+    Transform* transform = dynamic_cast<Transform*>(gameObject()->getComponent("Transform"));
+    if (!transform) {
+        return;
+    }
+    m_front = (m_target - transform->getPosition()).normalized();
+    updateCoord();
+    updateViewMatrix();
+    updateOrtho();
 }
 
 void Camera::updateCoord() {
@@ -85,7 +104,7 @@ void Camera::updateViewMatrix()
         m_view.transposeInPlace();
 
         m_viewDirty = false;
-    }
+     }
 }
 
 void Camera::updateProjectionMatrix() {
@@ -99,6 +118,16 @@ void Camera::updateProjectionMatrix() {
     m_projection(2, 2) = (m_zFar + m_zNear) / (m_zFar - m_zNear);
     m_projection(2, 3) = 1.0f;
     m_projection(3, 2) = -(m_zFar * m_zNear) / (m_zFar - m_zNear);
+}
+
+void Camera::updateOrtho() {
+    float range = 1.0f / (m_zFar - m_zNear);
+    m_projection = Eigen::Matrix4f::Zero();
+    m_projection(0,0) = 2.0f / m_width;
+    m_projection(1,1) = 2.0f / m_height;
+    m_projection(2, 2) = range;
+    m_projection(3, 2) = -range * m_zNear;
+    m_projection(3, 3) = 1.0f;
 }
 
 void Camera::copy(Eigen::Matrix4f& mat, DirectX::XMMATRIX& dxMat) {

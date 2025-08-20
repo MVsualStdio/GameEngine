@@ -10,7 +10,9 @@ public:
 
 	void setPosition(Eigen::Vector3f position) { m_position = position; }
 	void setScale(Eigen::Vector3f scale) { m_scale = scale; }
-	void setRotate(Eigen::Vector3f rotate) { m_rotate = rotate; }
+	void setRotate(Eigen::Vector3f rotate) { 
+		m_rotate = rotate; 
+	}
 	void offsetPosition(Eigen::Vector3f offset) { m_position += offset; }
 
 	Eigen::Vector3f getPosition() { return m_position; }

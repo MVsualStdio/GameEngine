@@ -4,6 +4,7 @@
 #include "../Core/Component/Transform.h"
 #include "../Core/IDrawer.h"
 #include "../Core/MeshRender.h"
+#include "XComponent/XLightCpt.h"
 
 class XWoodCrateBox : public GameObject {
 public:
@@ -16,4 +17,5 @@ private:
 	Transform* m_transform;
 	MeshRender* m_render;
 	Texture2D* m_texture;
+	XLightCpt* m_light;
 };

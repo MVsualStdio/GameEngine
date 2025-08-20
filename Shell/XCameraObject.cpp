@@ -16,8 +16,9 @@ void XCameraObject::init(IDrawer* drawer, D3D11Context* context) {
 	if (!m_cameraTransfrom) {
 		m_cameraTransfrom = dynamic_cast<Transform*>(addComponent("Transform"));
 	}
-	m_cameraTransfrom->setPosition(Eigen::Vector3f{ 10,10,-10 });
+	m_cameraTransfrom->setPosition(Eigen::Vector3f{ 40,40,-40 });
 	m_camera->setProjection(Eigen::Vector3f{ 0,0,0 }, context->AspectRatio());
+	//m_camera->setOrtho(Eigen::Vector3f{ 0,0,0 }, 40, 40);
 	m_camera->setRenderPass(drawer);
 }
 
