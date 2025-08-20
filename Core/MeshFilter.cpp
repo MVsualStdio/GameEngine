@@ -215,3 +215,47 @@ std::shared_ptr<AnyVertexBuffer> Geometry::CreatePlane(float width, float depth,
 
     return std::make_shared<AnyVertexBuffer>(pVertex);
 }
+
+std::unordered_map<std::string, std::vector<MeshFilter::MeshInfo>> MeshFilter::gMeshs;
+
+std::vector<MeshFilter::MeshInfo> MeshFilter::getMeshs(std::string path) {
+    if (gMeshs.find(path) != gMeshs.end()) {
+        return gMeshs[path];
+    }
+    if (loadScene(path)) {
+        MeshFilter::getMeshs(path);
+    }
+}
+
+MeshFilter* MeshFilter::instance() {
+    static MeshFilter gMeshFilter;
+    return &gMeshFilter;
+}
+
+bool MeshFilter::loadScene(std::string path) {
+    Assimp::Importer importer;
+    const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
+        return false;
+    }
+
+    // process ASSIMP's root node recursively
+    return processNode(path, scene->mRootNode, scene);
+    
+}
+
+bool MeshFilter::processNode(std::string& key, aiNode* node, const aiScene* scene) {
+    for (unsigned int i = 0; i < node->mNumMeshes; i++) {
+        aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+        gMeshs[key].push_back(processMesh(mesh, scene));
+    }
+    for (unsigned int i = 0; i < node->mNumChildren; i++) {
+        processNode(key, node->mChildren[i], scene);
+    }
+    return true;
+}
+
+MeshFilter::MeshInfo MeshFilter::processMesh(aiMesh* mesh, const aiScene* scene) {
+
+}

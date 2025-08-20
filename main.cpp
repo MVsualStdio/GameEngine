@@ -5,9 +5,6 @@
 #include "Shell/XWoodCrateBox.h"
 #include "Core/Component/GameObject.h"
 
-void init() {
-}
-
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
 

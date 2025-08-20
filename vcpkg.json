@@ -2,6 +2,7 @@
   "dependencies": [
     "rttr",
     "eigen3",
-    "qt5"
+    "qt5",
+    "assimp"
   ]
 }

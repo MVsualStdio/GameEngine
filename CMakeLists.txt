@@ -14,7 +14,8 @@ set(CMAKE_AUTORCC ON)
 find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets)
 find_package(Eigen3 REQUIRED)
 find_package(rttr REQUIRED)
-
+find_package(assimp REQUIRED)
+ 
 set(CoreFiles     
     Core/D3D11Context.h Core/D3D11Context.cpp
     Core/DrawManger.h Core/DrawManger.cpp
@@ -92,5 +93,7 @@ target_link_libraries(engineMain
     RTTR::Core
 
     Eigen3::Eigen
+
+    assimp::assimp
 
     d3d11.lib dxgi.lib dxguid.lib D3DCompiler.lib winmm.lib)

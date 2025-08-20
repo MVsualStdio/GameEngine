@@ -34,7 +34,6 @@ public:
 	const size_t indexSize() const { return m_self->indexSize(); }
 	const size_t indexCount() const  { return m_self->indexCount(); }
 
-
 	const D3D11_INPUT_ELEMENT_DESC* layout() const  { return m_self->layout(); }
 	const unsigned int layoutCount() const  { return m_self->layoutCount(); }
 
@@ -52,6 +51,7 @@ private:
 
 		virtual const D3D11_INPUT_ELEMENT_DESC* layout() const = 0;
 		virtual const unsigned int layoutCount() const = 0;
+
 	};
 
 	template<typename VertexType>
@@ -70,6 +70,8 @@ private:
 
 		const D3D11_INPUT_ELEMENT_DESC* layout() const override { return m_buffer->layout(); }
 		const unsigned int layoutCount() const override { return m_buffer->layoutCount(); }
+
+
 	};
 
 
