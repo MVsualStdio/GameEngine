@@ -5,7 +5,7 @@
 
 class Transform : public Component {
 public:
-	Transform();
+	Transform(bool isComponent = true);
 	~Transform() = default;
 
 	void setPosition(Eigen::Vector3f position) { m_position = position; }

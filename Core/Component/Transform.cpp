@@ -10,8 +10,9 @@ RTTR_REGISTRATION
 			.property("m_scale", &Transform::getScale, &Transform::setScale);
 }
 
-Transform::Transform()
-	: m_position{0,0,0}
+Transform::Transform(bool isComponent)
+    : Component(isComponent)
+	, m_position{0,0,0}
 	, m_scale(1,1,1)
 	, m_rotate(0,0,0) {
 

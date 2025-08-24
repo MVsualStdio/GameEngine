@@ -26,9 +26,9 @@ protected:
 	IDrawer* m_drawer;
 	CameraChangeFunction m_cameraOp;
 private:
-	std::shared_ptr<Pipeline> m_pipeline;
+	std::vector<std::shared_ptr<Pipeline>> m_pipelines;
 	std::shared_ptr<Material> m_material;
-	std::shared_ptr<AnyVertexBuffer> m_vertex;
+	std::vector<std::shared_ptr<AnyVertexBuffer>> m_vertex;
 protected:
-	virtual void initPipeline();
+	virtual void initPipeline(std::vector<std::shared_ptr<AnyVertexBuffer>> vertex);
 };

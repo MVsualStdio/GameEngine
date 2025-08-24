@@ -6,8 +6,10 @@ std::vector<Component*> Component::getAllComponents() {
 	return gAllComponent;
 }
 
-Component::Component() {
-	gAllComponent.push_back(this);
+Component::Component(bool needPush) {
+	if (needPush) {
+		gAllComponent.push_back(this);
+	}
 }
 
 Component::~Component() {

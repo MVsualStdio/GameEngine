@@ -1,15 +1,15 @@
 #include "Pipeline.h"
 #include "MeshFilter.h"
 
-Pipeline::Pipeline(D3D11Context* context, Material* material, AnyVertexBuffer* vertex, IDrawer* drawer)
+Pipeline::Pipeline(D3D11Context* context, Material* material, IDrawer* drawer, AnyVertexBuffer* vertex)
 	: m_context(context)
 	, m_material(material)
 	, m_drawer(drawer)
-	, m_vertex(vertex) {
+	, m_vertex(vertex) { 
 
 	m_context->m_Device->CreateInputLayout(vertex->layout(), vertex->layoutCount(),
-		material->getVSShader()->getBlob()->GetBufferPointer(), 
-		material->getVSShader()->getBlob()->GetBufferSize(), &pInputLayout);
+		m_material->getVSShader()->getBlob()->GetBufferPointer(),
+		m_material->getVSShader()->getBlob()->GetBufferSize(), &pInputLayout);
 
 	CD3D11_BUFFER_DESC bufferDesc(0,
 		D3D11_BIND_VERTEX_BUFFER,
@@ -25,7 +25,6 @@ Pipeline::Pipeline(D3D11Context* context, Material* material, AnyVertexBuffer* v
 	bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	initData.pSysMem = vertex->indexData();
 	m_context->m_Device->CreateBuffer(&bufferDesc, &initData, pIndexBuffer.GetAddressOf());
-
 	D3D11_SAMPLER_DESC sampDesc;
 	ZeroMemory(&sampDesc, sizeof(sampDesc));
 	sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
@@ -37,6 +36,7 @@ Pipeline::Pipeline(D3D11Context* context, Material* material, AnyVertexBuffer* v
 	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 	m_context->m_Device->CreateSamplerState(&sampDesc, pSampleState.GetAddressOf());
 }
+
 
 void Pipeline::IA() {
 	UINT size = m_vertex->vertexSize();

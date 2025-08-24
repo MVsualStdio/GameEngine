@@ -5,6 +5,7 @@
 #include "../Core/IDrawer.h"
 #include "../Core/MeshRender.h"
 #include "XComponent/XLightCpt.h"
+#include "../Core/Animation/KeyAnimation.h"
 
 class XWoodCrateBox : public GameObject {
 public:
@@ -18,4 +19,7 @@ private:
 	MeshRender* m_render;
 	Texture2D* m_texture;
 	XLightCpt* m_light;
+	KeyAnimation* anim;
+	std::vector<MeshInfo> mesh;
+
 };

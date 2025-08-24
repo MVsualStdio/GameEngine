@@ -5,6 +5,7 @@
 
 #include "Eigen/Dense"
 #include "../Core/Component/Component.h"
+#include "../Core/VertexLayout.h"
 
 
 XWoodCrateBox::XWoodCrateBox()
@@ -42,7 +43,17 @@ void XWoodCrateBox::init(IDrawer* drawer, D3D11Context* context, Texture2D* text
 	material->getPSShader()->setTexture(0, textureDDS);
 	material->getPSShader()->setTexture(1, *m_texture);
 	m_render->setMaterial(std::shared_ptr<Material>(material));
-	m_render->setVertex(Geometry::CreateCube(2.0f, 2.0f, 2.0f));
+
+	//m_render->setVertex(Geometry::CreateCube(2.0f, 2.0f, 2.0f));
+	std::string path = "C:/Users/41795/Downloads/jiggly_watermelon_jello/scene.gltf";
+	mesh = MeshFilter::instance()->getMeshInfo(path);
+	
+	for (int i = 0; i < mesh.size(); ++i) {
+		std::shared_ptr<VertexBuffer<VertexUV>> vertex = mesh[i].vertexs->vertex<VertexUV>();
+		m_render->setVertex(mesh[i].vertexs);
+	}
+	Model model = MeshFilter::instance()->getModel(path);
+	anim = new KeyAnimation(path, &model);
 
 	m_render->cameraRender([](MeshRender* render, Camera* camera)->void {
 		render->getMaterial()->getVSShader()->setUniform("g_View", camera->view());
@@ -54,6 +65,18 @@ void XWoodCrateBox::init(IDrawer* drawer, D3D11Context* context, Texture2D* text
 }
 
 void XWoodCrateBox::update(double dt) {
+	m_time += dt * 0.001;
+	anim->update(m_time);
+	std::unordered_map<int, Eigen::Matrix4f> matrixs = anim->getfinalVertex();
+	for (int i = 0; i < mesh.size(); ++i) {
+		std::shared_ptr<VertexBuffer<VertexUV>> vertex = mesh[i].vertexs->vertex<VertexUV>();
+		Eigen::Vector3<float>& pos = vertex->vertices[vertex->bonesWidget[i].vertexIndex].pos;
+		Eigen::Vector4<float> pos4 = { pos.x(),pos.y() ,pos.z() ,1.0f };
+		pos4 = matrixs[vertex->bonesWidget[i].boneIndex] * pos4;
+		pos4 = pos4 / pos4.w();
+		pos = { pos4.x(),pos4.y(),pos4.z() };
+	}
+
 	//float RotationSpeed = 1.0f / 1000.0f;
 	//m_time += RotationSpeed * dt;
 	//Eigen::Matrix4f world = Eigen::Matrix4f::Identity();

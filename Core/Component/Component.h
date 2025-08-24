@@ -4,7 +4,7 @@
 class GameObject;
 class Component {
 public:
-	Component();
+	Component(bool needPush = true);
 	virtual ~Component();
 	GameObject* gameObject();
 	void setGameObject(GameObject* object);

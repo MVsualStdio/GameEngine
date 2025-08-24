@@ -6,7 +6,8 @@
 
 class Pipeline {
 public:
-	Pipeline(D3D11Context* context, Material* material, AnyVertexBuffer* vertex, IDrawer* drawer);
+	Pipeline(D3D11Context* context, Material* material, IDrawer* drawer, AnyVertexBuffer* vertex);
+
 	virtual void IA();
 	virtual void VS();
 	virtual void Rasterizer();
