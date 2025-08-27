@@ -25,6 +25,7 @@ Pipeline::Pipeline(D3D11Context* context, Material* material, IDrawer* drawer, A
 	bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	initData.pSysMem = vertex->indexData();
 	m_context->m_Device->CreateBuffer(&bufferDesc, &initData, pIndexBuffer.GetAddressOf());
+
 	D3D11_SAMPLER_DESC sampDesc;
 	ZeroMemory(&sampDesc, sizeof(sampDesc));
 	sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
@@ -36,7 +37,6 @@ Pipeline::Pipeline(D3D11Context* context, Material* material, IDrawer* drawer, A
 	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 	m_context->m_Device->CreateSamplerState(&sampDesc, pSampleState.GetAddressOf());
 }
-
 
 void Pipeline::IA() {
 	UINT size = m_vertex->vertexSize();

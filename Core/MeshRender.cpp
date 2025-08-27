@@ -65,4 +65,3 @@ void MeshRender::setMaterial(std::shared_ptr<Material> material) {
 void MeshRender::setVertex(std::shared_ptr<AnyVertexBuffer> vertex) {
 	m_vertex.push_back(vertex);
 }
-

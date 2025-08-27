@@ -1,13 +1,14 @@
 #include "KeyAnimation.h"
+#include "../LoadScence.h"
 #include <iostream>
 
-Bone::Bone(const std::string& name, int ID, const aiNodeAnim* channel)
-    : m_name(name)
-    , m_id(ID) 
-    , m_transform(false) {
+KeyAnimationClip::KeyAnimationClip()
+    : m_transform(false) {
 
-    m_numPosition = channel->mNumPositionKeys;
-    for (int k = 0; k < m_numPosition; ++k) {
+}
+
+void KeyAnimationClip::init(const aiNodeAnim* channel) {
+    for (int k = 0; k < channel->mNumPositionKeys; ++k) {
         aiVector3D aiPosition = channel->mPositionKeys[k].mValue;
         float timeStamp = channel->mPositionKeys[k].mTime;
         VectorKey key;
@@ -16,9 +17,34 @@ Bone::Bone(const std::string& name, int ID, const aiNodeAnim* channel)
         m_positions.push_back(key);
     }
 
+    for (int k = 0; k < channel->mNumScalingKeys; ++k) {
+        aiVector3D aiPosition = channel->mScalingKeys[k].mValue;
+        float timeStamp = channel->mScalingKeys[k].mTime;
+        VectorKey key;
+        key.timePos = timeStamp;
+        key.value = { aiPosition.x, aiPosition.y ,aiPosition.z };
+        m_scale.push_back(key);
+    }
+
+    for (int k = 0; k < channel->mNumRotationKeys; ++k)
+    {
+        aiQuaternion aiOrientation = channel->mRotationKeys[k].mValue;
+        float timeStamp = channel->mRotationKeys[k].mTime;
+        RotKey data;
+        data.value = { aiOrientation.w, aiOrientation.x,aiOrientation.y,aiOrientation.z };
+        data.timePos = timeStamp;
+        m_rotation.push_back(data);
+    }
 }
 
-float Bone::getScaleFactor(float lastTimeStamp, float nextTimeStamp, float animationTime) {
+Transform KeyAnimationClip::update(float animationTime) {
+    interpolatePosition(animationTime);
+    interpolateRotation(animationTime);
+    interpolateScale(animationTime);
+    return m_transform;
+}
+
+float KeyAnimationClip::getScaleFactor(float lastTimeStamp, float nextTimeStamp, float animationTime) {
     float scaleFactor = 0.0f;
     float midWayLength = animationTime - lastTimeStamp;
     float framesDiff = nextTimeStamp - lastTimeStamp;
@@ -26,17 +52,74 @@ float Bone::getScaleFactor(float lastTimeStamp, float nextTimeStamp, float anima
     return scaleFactor;
 }
 
-int Bone::getPositionIndex(float animTime) {
-    for (int i = 0; i < m_numPosition - 1; ++i) {
+int KeyAnimationClip::getPositionIndex(float animTime) {
+    int i = 0;
+    for (; i < m_positions.size() - 1; ++i) {
         if (animTime < m_positions[i + 1].timePos) {
             return i;
         }
     }
-    return -1;
+    return i - 1;
 }
 
-void Bone::interpolatePosition(float animationTime) {
-    if (m_numPosition == 1) {
+int KeyAnimationClip::getScaleIndex(float animationTime) {
+    int i = 0;
+    for (; i < m_scale.size() - 1; ++i) {
+        if (animationTime < m_scale[i + 1].timePos) {
+            return i;
+        }
+    }
+    return i - 1;
+}
+
+int KeyAnimationClip::getRotationIndex(float animationTime) {
+    int i = 0;
+    for (; i < m_rotation.size() - 1; ++i) {
+        if (animationTime < m_rotation[i + 1].timePos) {
+            return i;
+        }
+    }
+    return i - 1;
+}
+
+void KeyAnimationClip::interpolateScale(float animationTime) {
+    if (m_scale.size() <= 0) {
+        return;
+    }
+    if (m_scale.size() == 1) {
+        m_transform.setScale(m_scale[0].value);
+        return;
+    }
+    int p0Index = getScaleIndex(animationTime);
+    int p1Index = p0Index + 1;
+    float factor = getScaleFactor(m_scale[p0Index].timePos,
+        m_scale[p1Index].timePos, animationTime);
+    Eigen::Vector3f scale = factor * m_scale[p0Index].value + (1 - factor) * m_scale[p1Index].value;
+    m_transform.setScale(scale);
+}
+
+void KeyAnimationClip::interpolateRotation(float animationTime) {
+    if (m_rotation.size() <= 0) {
+        return;
+    }
+    if (m_rotation.size() == 1) {
+        m_transform.setQuaternion(m_rotation[0].value);
+        return;
+    }
+    int p0Index = getRotationIndex(animationTime);
+    int p1Index = p0Index + 1;
+    float factor = getScaleFactor(m_rotation[p0Index].timePos,
+        m_rotation[p1Index].timePos, animationTime);
+    Eigen::Quaternionf rot = m_rotation[p0Index].value.slerp((1 - factor), m_rotation[p1Index].value);
+    m_transform.setQuaternion(rot);
+}
+
+void KeyAnimationClip::interpolatePosition(float animationTime) {
+    if (m_positions.size() <= 0) {
+        return;
+    }
+    if (m_positions.size() == 1) {
+        m_transform.setPosition(m_positions[0].value);
         return;
     }
     int p0Index = getPositionIndex(animationTime);
@@ -47,21 +130,18 @@ void Bone::interpolatePosition(float animationTime) {
     m_transform.setPosition(position);
 }
 
-void Bone::update(float animationTime) {
-    interpolatePosition(animationTime);
-}
-
-Transform Bone::getTransform() {
-    return m_transform;
-}
-
-KeyAnimation::KeyAnimation(std::string path, Model* model){
-	const aiScene* scene = LoadScene::importer()->ReadFile(path, LoadScene::loadFlag());
+LoadKeyAnimation::LoadKeyAnimation(std::string path) {
+    const aiScene* scene = LoadScene::importer()->ReadFile(path, LoadScene::loadFlag());
+    int num = scene->mNumAnimations;
     m_animation = scene->mAnimations[0];
     m_duration = m_animation->mDuration;
     m_ticksPerSecond = m_animation->mTicksPerSecond != 0 ? m_animation->mTicksPerSecond : 25.0f;
-    readHierarchyData(m_RootNode, scene->mRootNode);
-    readMissingBones(m_animation, *model);
+    readAnimNodes(m_rootNode, scene->mRootNode);
+    readAnimChannel(m_animation);
+}
+
+std::unordered_map<std::string, NodeAnim> LoadKeyAnimation::getNodeAnim() {
+    return m_nodeAnimMap;
 }
 
 static inline Eigen::Matrix4f ConvertMatrixToEigenFormat(const aiMatrix4x4& from)
@@ -74,55 +154,69 @@ static inline Eigen::Matrix4f ConvertMatrixToEigenFormat(const aiMatrix4x4& from
     };
 }
 
-void KeyAnimation::readHierarchyData(AssimpNodeData& dest, const aiNode* src) {
+void LoadKeyAnimation::readAnimNodes(NodeAnim& dest, aiNode* src) {
     dest.name = src->mName.data;
-    dest.transformation = ConvertMatrixToEigenFormat(src->mTransformation);
-    dest.childrenCount = src->mNumChildren;
-    for (int i = 0; i < src->mNumChildren; ++i) {
-        AssimpNodeData newData;
-        readHierarchyData(newData, src->mChildren[i]);
-        dest.children.push_back(newData);
-    }
-}
-
-void KeyAnimation::readMissingBones(const aiAnimation* animation, Model& model) {
-    int size = animation->mNumChannels;
-    std::unordered_map<std::string, BoneInfo> bones = model.bone;
-    int& boneCount = model.boneCount;
-    for (int i = 0; i < size; i++) {
-        auto channel = animation->mChannels[i];
-        std::string boneName = channel->mNodeName.data;
-
-        if (bones.find(boneName) == bones.end()) {
-            bones[boneName].id = boneCount;
-            boneCount++;
+    
+    if (m_nodeAnimMap.find(dest.name) != m_nodeAnimMap.end()) {
+        std::string baseName = dest.name + std::string("_$Assimp");
+        for (int i = 0; m_nodeAnimMap.find(dest.name) != m_nodeAnimMap.end(); ++i) {
+            dest.name = baseName + std::to_string(i);
         }
-        m_bone[boneName] = Bone(channel->mNodeName.data,
-            bones[channel->mNodeName.data].id, channel);
     }
-    m_boneInfo = bones;
+
+    dest.transformation = ConvertMatrixToEigenFormat(src->mTransformation);
+    for (int i = 0; i < src->mNumChildren; ++i) {
+        NodeAnim node;
+        readAnimNodes(node, src->mChildren[i]);
+        dest.children.push_back(node);
+    }
+
+    m_nodeAnimMap[dest.name] = dest;
 }
 
-void KeyAnimation::calculateBoneTransform(float time, const AssimpNodeData* node, Eigen::Matrix4f parentTransform) {
+void LoadKeyAnimation::readAnimChannel(const aiAnimation* animation) {
+    for (int i = 0; i < animation->mNumChannels; i++) {
+        const aiNodeAnim* channel = animation->mChannels[i];
+        
+        std::string channelName = channel->mNodeName.data;
+        std::cout << channelName << std::endl;
+
+        if (m_nodeAnimMap.find(channelName) != m_nodeAnimMap.end()) {
+            m_nodeAnimMap[channelName].activate = true;
+            m_nodeAnimMap[channelName].animClip.init(channel);
+        }
+    }
+}
+
+
+Animation::Animation(std::string path)
+    : m_load(path) {
+    m_nodeAnimMap = m_load.getNodeAnim();
+}
+
+void Animation::update(double dt) {
+    m_CurrentTime += dt;
+    m_CurrentTime = std::fmod(m_CurrentTime, m_load.getDuration());
+    calculateTransform(m_CurrentTime, m_load.getRootNode(), Eigen::Matrix4f::Identity());
+}
+
+void Animation::calculateTransform(float time, const NodeAnim* node, Eigen::Matrix4f parentTransform) {
     std::string nodeName = node->name;
-    Eigen::Matrix4f finalTransform = Eigen::Matrix4f::Identity();
-    Eigen::Matrix4f globalTransformation = parentTransform;
-    if (m_bone.find(nodeName) != m_bone.end() && m_boneInfo.find(nodeName) != m_boneInfo.end()) {
+    NodeAnim animNode = m_nodeAnimMap[nodeName];
 
-        Bone bone = m_bone[nodeName];
-        bone.update(time);
-        Eigen::Matrix4f nodeTransform = bone.getTransform().getMatrix();
-        globalTransformation = parentTransform * nodeTransform;
-        finalTransform = m_boneInfo[nodeName].offset * globalTransformation;
+    Eigen::Matrix4f nodeTransform = node->transformation;
+    if (nodeName == "Frame") {
+        int x = 1;
+    }
+    if (m_nodeAnimMap.find(nodeName) != m_nodeAnimMap.end() && animNode.activate) {
+        Transform transform = animNode.animClip.update(time);
+        nodeTransform = transform.getMatrix();
     }
 
-    m_boneTransform[m_boneInfo[nodeName].id] = finalTransform;
-    for (int i = 0; i < node->childrenCount; i++) {
-        calculateBoneTransform(time, &node->children[i], globalTransformation);
-    }
-}
+    Eigen::Matrix4f globalTransformation = parentTransform * nodeTransform;
+    m_nodeAnimUpdateMap[nodeName] = globalTransformation;
 
-void KeyAnimation::update(float animationTime) {
-    float time = std::fmod(animationTime, m_duration);
-    calculateBoneTransform(time, &m_RootNode, Eigen::Matrix4f::Identity());
+    for (int i = 0; i < animNode.children.size(); i++) {
+        calculateTransform(time, &node->children[i], globalTransformation);
+    }
 }

@@ -9,8 +9,6 @@ const D3D11_INPUT_ELEMENT_DESC DefaultLayout[4] = {
 	{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 };
 
-
-
 struct VertexUV {
 	Eigen::Vector3<float> pos;
 	Eigen::Vector3<float> normal;

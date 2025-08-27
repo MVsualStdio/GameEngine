@@ -7,6 +7,7 @@
 #include "XWoodCrateBox.h"
 #include "XPlane.h"
 #include "XLight.h"
+#include "XCarAnimation.h"
 
 constexpr float XM_PIDIV2 = 1.570796327f;
 
@@ -79,8 +80,8 @@ void DrawMangerScreen::initCompent() {
 		walls->init(m_drawScreen, m_context.get(), &brick, Geometry::CreatePlane(20.0f, 8.0f, 5.0f, 1.5f));
 	}
 
-	XWoodCrateBox* box = new XWoodCrateBox();
-	box->init(m_drawScreen, m_context.get(), m_Tranglepass->getRenderTarget());
+	XCarAnimation* car = new XCarAnimation();
+	car->init(m_drawScreen, m_context.get(), m_Tranglepass->getRenderTarget());
 
 	XLight* light = new XLight();
 	light->init(m_drawScreen, m_context.get());

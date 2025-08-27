@@ -1,67 +1,80 @@
 #pragma once
-
-#include "../LoadScence.h"
 #include "../MeshFilter.h"
-#include <unordered_map>
-#include <Eigen/Core>
 #include "../Component/Transform.h"
-struct AssimpNodeData
-{
-	Eigen::Matrix4f transformation;
-	std::string name;
-	int childrenCount;
-	std::vector<AssimpNodeData> children;
-};
-
-struct VectorKey {
-	float timePos;
-	Eigen::Vector3f value;
-};
-
-class Bone
-{
+class KeyAnimationClip {
 public:
-	Bone(const std::string& name, int ID, const aiNodeAnim* channel);
-	Bone() = default;
-	void update(float animationTime);
-	Transform getTransform();
+	struct VectorKey {
+		float timePos;
+		Eigen::Vector3f value;
+	};
+	struct RotKey {
+		float timePos;
+		Eigen::Quaternionf value;
+	};
+
+	KeyAnimationClip();
+	void init(const aiNodeAnim* channel);
+	Transform update(float animationTime);
 private:
 	int getPositionIndex(float animationTime);
 	void interpolatePosition(float animationTime);
+
+	int getScaleIndex(float animationTime);
+	void interpolateScale(float animationTime);
+
+	int getRotationIndex(float animationTime);
+	void interpolateRotation(float animationTime);
+
 	float getScaleFactor(float lastTimeStamp, float nextTimeStamp, float animationTime);
 private:
-	std::vector<VectorKey> m_positions;
-	std::string m_name;
-	int m_id;
 	Transform m_transform;
-	unsigned int m_numPosition;
+
+	std::vector<RotKey> m_rotation;
+	std::vector<VectorKey> m_positions;
+	std::vector<VectorKey> m_scale;
+
 };
 
-class KeyAnimation {
+
+struct NodeAnim{
+	std::string name;
+	Eigen::Matrix4f transformation;
+	std::vector<NodeAnim> children;
+	KeyAnimationClip animClip;
+	bool activate = false;
+};
+
+class LoadKeyAnimation {
 public:
-	KeyAnimation(std::string path, Model* model); 
-	
-	void update(float animationTime);
-	std::unordered_map<int, Eigen::Matrix4f> getfinalVertex() { return m_boneTransform; }
-
+	LoadKeyAnimation(std::string path);
+	std::unordered_map<std::string, NodeAnim> getNodeAnim();
+	float getDuration() { return m_duration; }
+	NodeAnim* getRootNode() { return &m_rootNode; }
 private:
-	std::unordered_map<std::string, std::vector<VectorKey>> m_animPosition;
-	std::unordered_map<std::string, Bone> m_bone;
-	std::unordered_map<std::string, BoneInfo> m_boneInfo;
-	std::unordered_map<int, Eigen::Matrix4f> m_boneTransform;
+	std::unordered_map<std::string, NodeAnim> m_nodeAnimMap;
 
+	NodeAnim m_rootNode;
 	aiAnimation* m_animation;
-	double m_duration;
-	double m_ticksPerSecond;
-	AssimpNodeData m_RootNode;
-
-	double m_CurrentTime = 0.0;
+	float  m_duration;
+	float m_ticksPerSecond;
 	
-private:
-	void readHierarchyData(AssimpNodeData& dest, const aiNode* src);
-	void readMissingBones(const aiAnimation* animation, Model& model);
-	void calculateBoneTransform(float time, const AssimpNodeData* node, Eigen::Matrix4f parentTransform);
+	void readAnimNodes(NodeAnim& dest, aiNode* src);
+	void readAnimChannel(const aiAnimation* animation);
+	
 };
 
+class Animation {
+public:
+	Animation(std::string path);
+	void update(double dt);
+	std::unordered_map<std::string, Eigen::Matrix4f> getAnimMat() { return m_nodeAnimUpdateMap; }
+private:
+	LoadKeyAnimation m_load;
+	std::unordered_map<std::string, NodeAnim> m_nodeAnimMap;
+	double m_CurrentTime = 0.0;
 
-//return true;
+	std::unordered_map<std::string, Eigen::Matrix4f> m_nodeAnimUpdateMap;
+
+
+	void calculateTransform(float time, const NodeAnim* node, Eigen::Matrix4f parentTransform);
+};

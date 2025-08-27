@@ -41,19 +41,22 @@ void DrawMangerBase::init(HWND winID, uint32_t width, uint32_t height) {
 	initCompent();
 	
 	for (auto gameObj : GameObject::getALLGameObject()) {
-		Component* component = gameObj->getComponent("MeshRender");
-		if (!component) {
-			continue;
+		std::vector<Component*> components = gameObj->getComponents("MeshRender");
+		for (Component* component : components) {
+			if (!component) {
+				continue;
+			}
+			MeshRender* render = dynamic_cast<MeshRender*>(component);
+			if (!render) {
+				continue;
+			}
+			if (m_drawList.find(render->getPass()) == m_drawList.end()) {
+				m_drawList.emplace(render->getPass());
+			}
+			auto drawer = m_drawList.find(render->getPass());
+			(*drawer)->addItem(render);
 		}
-		MeshRender* render = dynamic_cast<MeshRender*>(component);
-		if (!render) {
-			continue;
-		}
-		if (m_drawList.find(render->getPass()) == m_drawList.end()) {
-			m_drawList.emplace(render->getPass());
-		}
-		auto drawer = m_drawList.find(render->getPass());
-		(*drawer)->addItem(render);
+
 	}
 }
 

@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(engine)
 set(CMAKE_CXX_STANDARD 17)
-include(D:/work//vcpkg/scripts/buildsystems/vcpkg.cmake)
+include(E:/LearnSomething/vcpkg/scripts/buildsystems/vcpkg.cmake)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -34,8 +34,8 @@ set(CoreFiles
     Core/DDSTextureLoader11.h Core/DDSTextureLoader11.cpp
     Core/RenderPass.h Core/RenderPass.cpp
     Core/InputControl.h Core/InputControl.cpp
+    Core/Geometry.cpp
     Core/LoadScence.h  Core/LoadScence.cpp
-
     Core/Animation/KeyAnimation.h  Core/Animation/KeyAnimation.cpp
 )
 
@@ -52,6 +52,7 @@ set(ShellFiles
     Shell/XPlane.h Shell/XPlane.cpp
     Shell/XComponent/XLightCpt.h Shell/XComponent/XLightCpt.cpp
     Shell/XLight.h Shell/XLight.cpp
+    Shell/XCarAnimation.h Shell/XCarAnimation.cpp
 )
 
 set(WindowFiles

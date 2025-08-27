@@ -2,20 +2,12 @@
 #include "D3D11Context.h"
 #include "Eigen/Core"
 
-
-struct boneVertex {
-	int vertexIndex;
-	int boneIndex;
-	float boneWidget;
-};
-
 template<class Vertex>
 class VertexBuffer {
 public:
 	std::vector<Vertex> vertices;
-	std::vector<boneVertex> bonesWidget;
 	std::vector<uint32_t> indices;
-	
+
 	const Vertex* vertexData() const { return vertices.data(); }
 	const size_t vertexSize() const { return sizeof(Vertex); }
 	const size_t vertexCount() const { return vertices.size() * sizeof(Vertex); }
@@ -74,7 +66,7 @@ private:
 	template<typename VertexType>
 	struct Model : Concept {
 		std::shared_ptr<VertexBuffer<VertexType>> m_buffer;
-		
+
 		Model(std::shared_ptr<VertexBuffer<VertexType>> buf) : m_buffer(buf) {}
 
 		const void* vertexData() const override { return m_buffer->vertexData(); }
@@ -87,6 +79,7 @@ private:
 
 		const D3D11_INPUT_ELEMENT_DESC* layout() const override { return m_buffer->layout(); }
 		const unsigned int layoutCount() const override { return m_buffer->layoutCount(); }
+
 
 	};
 
