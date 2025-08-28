@@ -65,6 +65,7 @@ set(ResourceFiles
     HLSL/woodCrateBoxLight.hlsli
     HLSL/floor.hlsli
     HLSL/light.hlsli
+    HLSL/BoneAnimation.hlsli
 )
 
 source_group("Core Files" FILES ${CoreFiles})

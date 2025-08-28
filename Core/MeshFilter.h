@@ -4,9 +4,7 @@
 #include "IDrawer.h"
 #include "VertexLayout.h"
 #include <string>
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
+#include "LoadScence.h"
 
 class Geometry {
 public:
@@ -16,9 +14,33 @@ public:
 	static std::shared_ptr<AnyVertexBuffer> CreateCube(float width, float height, float depth, Eigen::Vector4f color);
 };
 
+const int NUM_BONES_PER_VERTEX = 1;
+
 struct NodeMesh {
-	std::shared_ptr<VertexBuffer<VertexUV>> vertexs;
+
+	struct BoneMesh {
+		float weights[NUM_BONES_PER_VERTEX];
+		std::string name[NUM_BONES_PER_VERTEX];
+		int indexs[NUM_BONES_PER_VERTEX] = { -1 };
+
+		void addBone(int index, std::string nodeName, float weight) {
+			for (size_t i = 0; i < NUM_BONES_PER_VERTEX; i++) {
+				if (weights[i] <= 0.0f) {
+					name[i] = nodeName;
+					weights[i] = weight;
+					indexs[i] = index;
+					return;
+				}
+			}
+		}
+	};
+
+	std::shared_ptr<VertexBuffer<VertexAnimation>> vertexs;
 	std::shared_ptr<Texture2D> textures;
+	std::vector<BoneMesh> bones;
+
+	std::unordered_map<std::string, std::pair<int,Eigen::Matrix4f>> boneIndexMap;
+	bool hasBone = false;
 };
 
 class LoadMesh {
@@ -29,9 +51,11 @@ public:
 	NodeMeshMap getNodeMesh() { return m_nodeMeshMap; }
 private:
 	NodeMeshMap m_nodeMeshMap;
+	
 private:
 	void loadNode(aiNode* node, const aiScene* scene);
 	NodeMesh loadMesh(aiMesh* mesh, const aiScene* scene);
+	int loadBone(NodeMesh& pVertex, aiMesh* mesh, const aiScene* scene);
 };
 
 class MeshFilter {

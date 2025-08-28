@@ -47,12 +47,14 @@ class ConstantBufferVariable {
 private:
 	void SetFloatMatrix(uint32_t rows, uint32_t cols, const float* noPadData);
 	void SetMatrixInBytes(uint32_t rows, uint32_t cols, const BYTE* noPadData);
+	void SetValue(const void* noPadData, uint32_t size);
 private:
 	struct PropertyFunctor
 	{
 		PropertyFunctor(ConstantBufferVariable& _cbv) : cbv(_cbv) {}
 		void operator()(const Eigen::Matrix4f& val) { cbv.SetFloatMatrix(4, 4, val.data()); }
 		void operator()(const Eigen::Vector3f& val) { cbv.SetFloatMatrix(1, 3, val.data()); }
+		void operator()(const std::vector<Eigen::Matrix4f>& val) { cbv.SetValue(val.data(), val.size() * sizeof(Eigen::Matrix4f)); }
 		void operator()(int value) {  }
 		void operator()(float value) {  }
 		void operator()(uint32_t value) {  }

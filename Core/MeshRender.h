@@ -18,6 +18,7 @@ public:
 	Material* getMaterial() { return m_material.get(); }
 
 	void setVertex(std::shared_ptr<AnyVertexBuffer> vertex);
+	void setVertex(std::shared_ptr<AnyVertexBuffer> vertex, int index);
 
 	void render(Camera* camera);
 	void cameraRender(CameraChangeFunction op);
@@ -29,6 +30,7 @@ private:
 	std::vector<std::shared_ptr<Pipeline>> m_pipelines;
 	std::shared_ptr<Material> m_material;
 	std::vector<std::shared_ptr<AnyVertexBuffer>> m_vertex;
+	bool m_init = false;
 protected:
 	virtual void initPipeline(std::vector<std::shared_ptr<AnyVertexBuffer>> vertex);
 };

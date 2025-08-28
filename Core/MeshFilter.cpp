@@ -25,7 +25,11 @@ void LoadMesh::loadNode(aiNode* node, const aiScene* scene) {
 }
 
 NodeMesh LoadMesh::loadMesh(aiMesh* mesh, const aiScene* scene) {
-    std::shared_ptr<VertexBuffer<VertexUV>> pVertex = std::make_shared<VertexUVData>();
+    //std::shared_ptr<VertexBuffer<VertexUV>> pVertex = std::make_shared<VertexUVData>();
+
+    std::shared_ptr<VertexBuffer<VertexAnimation>> pVertex = std::make_shared<VertexAnimationData>();
+
+    bool hasBone = mesh->mNumBones > 0;
 
     pVertex->vertices.resize(mesh->mNumVertices);
     for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
@@ -46,8 +50,42 @@ NodeMesh LoadMesh::loadMesh(aiMesh* mesh, const aiScene* scene) {
 
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
     std::shared_ptr<Texture2D> textures;
+    NodeMesh res = NodeMesh{ pVertex , textures };
 
-    return NodeMesh{ pVertex , textures };
+    loadBone(res, mesh, scene);
+    res.hasBone = hasBone;
+
+    if (hasBone) {
+        for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
+            pVertex->vertices[i].boneIndex = { res.bones[i].indexs[0], 0, 0, 0 };
+            pVertex->vertices[i].widget = { res.bones[i].weights[0], 0.0, 0.0, 0.0 };
+        }
+    }
+    return res;
+}
+
+int LoadMesh::loadBone(NodeMesh& nodeMesh, aiMesh* mesh, const aiScene* scene) {
+    nodeMesh.bones.resize(nodeMesh.vertexs->vertices.size());
+    
+    for (int boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex) {
+        
+        std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
+
+        Eigen::Matrix4f offset = Assimp2Eigen::ConvertMatrixToEigenFormat(mesh->mBones[boneIndex]->mOffsetMatrix);
+
+        nodeMesh.boneIndexMap[boneName] = { boneIndex,offset };
+        
+        aiVertexWeight* weights = mesh->mBones[boneIndex]->mWeights;
+        int numWeights = mesh->mBones[boneIndex]->mNumWeights;
+
+        for (int weightIndex = 0; weightIndex < numWeights; ++weightIndex) {
+            int vertexId = weights[weightIndex].mVertexId;
+            float weight = weights[weightIndex].mWeight;
+            nodeMesh.bones[vertexId].addBone(boneIndex, boneName, weight);
+           
+        }
+    }
+    return mesh->mNumBones;
 }
 
 MeshFilter* MeshFilter::instance() {

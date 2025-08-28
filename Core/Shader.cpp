@@ -1,5 +1,5 @@
 #include "Shader.h"
-
+#include <iostream>
 
 IShader::IShader(D3D11Context* context, LPCWSTR filename, LPCSTR entry, LPCSTR entryTarget)
 	: m_context(context) {
@@ -11,7 +11,7 @@ IShader::IShader(D3D11Context* context, LPCWSTR filename, LPCSTR entry, LPCSTR e
 	{
 		if (ppErrorMsgs != nullptr)
 		{
-			//std::cout << reinterpret_cast<const char*>(ppErrorMsgs->GetBufferPointer()) << std::endl;;
+			std::cout << reinterpret_cast<const char*>(ppErrorMsgs->GetBufferPointer()) << std::endl;;
 		}
 	}
 

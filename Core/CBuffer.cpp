@@ -41,6 +41,16 @@ ConstantBufferVariable::ConstantBufferVariable(std::string name_, uint32_t offse
 
 }
 
+void ConstantBufferVariable::SetValue(const void* noPadData, uint32_t size) {
+    BYTE* pData = pCBufferData->cbufferData.data() + startByteOffset;
+
+    if (memcmp(pData, noPadData, size)) {
+        memcpy_s(pData, size, noPadData, size);
+        pCBufferData->isDirty = true;
+    }
+
+}
+
 void ConstantBufferVariable::SetFloatMatrix(uint32_t rows, uint32_t cols, const float* noPadData) {
     SetMatrixInBytes(rows, cols, reinterpret_cast<const BYTE*>(noPadData));
 }

@@ -12,7 +12,7 @@
 
 class MeshRender;
 
-using Property = std::variant<int, uint32_t, float, Eigen::Matrix4f, Eigen::Vector3f>;
+using Property = std::variant<int, uint32_t, float, Eigen::Matrix4f, Eigen::Vector3f, std::vector<Eigen::Matrix4f>>;
 
 inline size_t StringToID(std::string_view str)
 {

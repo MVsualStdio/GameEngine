@@ -36,9 +36,13 @@ void MeshRender::initPipeline(std::vector<std::shared_ptr<AnyVertexBuffer>> vert
 }
 
 void MeshRender::render(Camera* camera) {
-	if (m_pipelines.size() == 0 && m_vertex.size() > 0) {
-		initPipeline(m_vertex);
+	if (m_vertex.size() > 0) {
+		if (!m_init || m_pipelines.size() == 0) {
+			initPipeline(m_vertex);
+			m_init = true;
+		}
 	}
+
 	if (gameObject()->getLayer() & camera->getCullMask() == 0) {
 		return;
 	}
@@ -64,4 +68,9 @@ void MeshRender::setMaterial(std::shared_ptr<Material> material) {
 
 void MeshRender::setVertex(std::shared_ptr<AnyVertexBuffer> vertex) {
 	m_vertex.push_back(vertex);
+}
+
+void MeshRender::setVertex(std::shared_ptr<AnyVertexBuffer> vertex, int index) {
+	m_vertex[index] = vertex;
+	m_init = false;
 }

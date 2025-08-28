@@ -144,15 +144,8 @@ std::unordered_map<std::string, NodeAnim> LoadKeyAnimation::getNodeAnim() {
     return m_nodeAnimMap;
 }
 
-static inline Eigen::Matrix4f ConvertMatrixToEigenFormat(const aiMatrix4x4& from)
-{
-    return Eigen::Matrix4f{
-       {from.a1, from.b1, from.c1, from.d1},
-       {from.a2, from.b2, from.c2, from.d2},
-       {from.a3, from.b3, from.c3, from.d3},
-       {from.a4, from.b4, from.c4, from.d4}
-    };
-}
+
+
 
 void LoadKeyAnimation::readAnimNodes(NodeAnim& dest, aiNode* src) {
     dest.name = src->mName.data;
@@ -164,7 +157,7 @@ void LoadKeyAnimation::readAnimNodes(NodeAnim& dest, aiNode* src) {
         }
     }
 
-    dest.transformation = ConvertMatrixToEigenFormat(src->mTransformation);
+    dest.transformation = Assimp2Eigen::ConvertMatrixToEigenFormat(src->mTransformation);
     for (int i = 0; i < src->mNumChildren; ++i) {
         NodeAnim node;
         readAnimNodes(node, src->mChildren[i]);
@@ -185,6 +178,7 @@ void LoadKeyAnimation::readAnimChannel(const aiAnimation* animation) {
             m_nodeAnimMap[channelName].activate = true;
             m_nodeAnimMap[channelName].animClip.init(channel);
         }
+
     }
 }
 
@@ -192,6 +186,20 @@ void LoadKeyAnimation::readAnimChannel(const aiAnimation* animation) {
 Animation::Animation(std::string path)
     : m_load(path) {
     m_nodeAnimMap = m_load.getNodeAnim();
+}
+
+std::vector<Eigen::Matrix4f> Animation::getBoneAnimMat(NodeMesh& mesh, Eigen::Matrix4f& world) {
+    if (mesh.hasBone) {
+        std::vector<Eigen::Matrix4f> res(mesh.boneIndexMap.size());
+        for (auto item : mesh.boneIndexMap) {
+            std::string name = item.first;
+            int index = item.second.first;
+            Eigen::Matrix4f boneMat = item.second.second;
+            res[index] = boneMat * m_nodeAnimUpdateMap[name] * world.inverse();
+        }
+        return res;
+    }
+    return std::vector<Eigen::Matrix4f>();
 }
 
 void Animation::update(double dt) {
@@ -205,15 +213,13 @@ void Animation::calculateTransform(float time, const NodeAnim* node, Eigen::Matr
     NodeAnim animNode = m_nodeAnimMap[nodeName];
 
     Eigen::Matrix4f nodeTransform = node->transformation;
-    if (nodeName == "Frame") {
-        int x = 1;
-    }
+
     if (m_nodeAnimMap.find(nodeName) != m_nodeAnimMap.end() && animNode.activate) {
         Transform transform = animNode.animClip.update(time);
         nodeTransform = transform.getMatrix();
     }
 
-    Eigen::Matrix4f globalTransformation = parentTransform * nodeTransform;
+    Eigen::Matrix4f globalTransformation = nodeTransform * parentTransform;
     m_nodeAnimUpdateMap[nodeName] = globalTransformation;
 
     for (int i = 0; i < animNode.children.size(); i++) {

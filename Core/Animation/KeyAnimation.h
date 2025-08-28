@@ -1,6 +1,7 @@
 #pragma once
 #include "../MeshFilter.h"
 #include "../Component/Transform.h"
+
 class KeyAnimationClip {
 public:
 	struct VectorKey {
@@ -48,6 +49,7 @@ class LoadKeyAnimation {
 public:
 	LoadKeyAnimation(std::string path);
 	std::unordered_map<std::string, NodeAnim> getNodeAnim();
+	
 	float getDuration() { return m_duration; }
 	NodeAnim* getRootNode() { return &m_rootNode; }
 private:
@@ -68,6 +70,7 @@ public:
 	Animation(std::string path);
 	void update(double dt);
 	std::unordered_map<std::string, Eigen::Matrix4f> getAnimMat() { return m_nodeAnimUpdateMap; }
+	std::vector<Eigen::Matrix4f> getBoneAnimMat(NodeMesh& mesh, Eigen::Matrix4f& world);
 private:
 	LoadKeyAnimation m_load;
 	std::unordered_map<std::string, NodeAnim> m_nodeAnimMap;
