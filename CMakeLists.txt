@@ -37,6 +37,8 @@ set(CoreFiles
     Core/Geometry.cpp
     Core/LoadScence.h  Core/LoadScence.cpp
     Core/Animation/KeyAnimation.h  Core/Animation/KeyAnimation.cpp
+    Core/TextureManager.h Core/TextureManager.cpp
+    Core/FileSystem.h Core/FileSystem.cpp
 )
 
 set(ComponentFiles
@@ -53,6 +55,7 @@ set(ShellFiles
     Shell/XComponent/XLightCpt.h Shell/XComponent/XLightCpt.cpp
     Shell/XLight.h Shell/XLight.cpp
     Shell/XCarAnimation.h Shell/XCarAnimation.cpp
+    Shell/XBoneAnimation.h Shell/XBoneAnimation.cpp
 )
 
 set(WindowFiles

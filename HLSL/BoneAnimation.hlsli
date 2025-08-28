@@ -66,11 +66,7 @@ VertexOut VS(VertexIn vIn)
 
 float4 PS(VertexOut pIn) : SV_TARGET
 {
-    float4 texColor1 = g_Tex.Sample(g_SamLinear, pIn.tex);
-    float4 texColor2 = g_Tex2.Sample(g_SamLinear, pIn.tex);
-    float4 abedo = texColor1 * 0.8 + texColor2 * 0.2;
-
-   // float4 abedo = texColor1;
+    float4 abedo = g_Tex.Sample(g_SamLinear, pIn.tex);
 
     float ambientStrength = 0.1f;
     float3 ambient = ambientStrength * lightColor;

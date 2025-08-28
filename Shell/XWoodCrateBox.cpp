@@ -6,7 +6,8 @@
 #include "Eigen/Dense"
 #include "../Core/Component/Component.h"
 #include "../Core/VertexLayout.h"
-
+#include "../Core/TextureManager.h"
+#include "../Core/FileSystem.h"
 
 XWoodCrateBox::XWoodCrateBox()
 	: GameObject("XWoodCrateBox") {
@@ -22,13 +23,12 @@ void XWoodCrateBox::init(IDrawer* drawer, D3D11Context* context, Texture2D* text
 
 	m_render->init(drawer, context);
 
-	ID3D11ShaderResourceView* textureView;
-	DirectX::CreateDDSTextureFromFile(context->m_Device.Get(), L"D:/work/GameEngine/HLSL/WoodCrate.dds", nullptr, &textureView);
-	Texture2D textureDDS(context, textureView);
-
+	std::string texturePath = "D:/work/GameEngine/HLSL/WoodCrate.dds";
+	TextureManager::instance()->addTexture(texturePath);
+	
 	Material* material = new Material(context);
-	material->setVSShader(L"D:/work/GameEngine/HLSL/woodCrateBoxLight.hlsli");
-	material->setPSShader(L"D:/work/GameEngine/HLSL/woodCrateBoxLight.hlsli");
+	material->setVSShader(FileSystem::HLSLWPath("/woodCrateBoxLight.hlsli").data());
+	material->setPSShader(FileSystem::HLSLWPath("/woodCrateBoxLight.hlsli").data());
 	
 	Eigen::Matrix4f world = m_transform->getMatrix();
 
@@ -40,7 +40,7 @@ void XWoodCrateBox::init(IDrawer* drawer, D3D11Context* context, Texture2D* text
 	Eigen::Vector3f color = Eigen::Vector3f{ m_light->getLightColor().x(),m_light->getLightColor().y(),m_light->getLightColor().z() };
 	material->getPSShader()->setUniform("lightColor", color);
 
-	material->getPSShader()->setTexture(0, textureDDS);
+	material->getPSShader()->setTexture(0, *TextureManager::instance()->getTexture(texturePath,context));
 	material->getPSShader()->setTexture(1, *m_texture);
 	m_render->setMaterial(std::shared_ptr<Material>(material));
 

@@ -8,18 +8,18 @@
 #include "XPlane.h"
 #include "XLight.h"
 #include "XCarAnimation.h"
+#include "../Core/TextureManager.h"
+#include "../Core/FileSystem.h"
+#include "XBoneAnimation.h"
 
 constexpr float XM_PIDIV2 = 1.570796327f;
 
 
 DrawMangerScreen::DrawMangerScreen() {
-
+	TextureManager::instance()->addTexture(FileSystem::HLSLPath("/floor.dds"));
+	TextureManager::instance()->addTexture(FileSystem::HLSLPath("/brick.dds"));
 }
 
-void DrawMangerScreen::initScene() {
-	//std::shared_ptr<MeshRender> box = std::make_shared<WoodCrateBox>(m_drawScreen, m_context.get(), m_scene.get(), *m_Tranglepass->getResult());
-	//m_scene->addMeshRender("box", box);
-}
 
 void DrawMangerScreen::initTranglePass() {
 
@@ -60,28 +60,32 @@ void DrawMangerScreen::initCompent() {
 
 	m_drawScreen = new DrawScreen(m_context.get());
 
-	ID3D11ShaderResourceView* textureView;
-	DirectX::CreateDDSTextureFromFile(m_context->m_Device.Get(), L"D:/work/GameEngine/HLSL/floor.dds", nullptr, &textureView);
-	Texture2D floor(m_context.get(), textureView);
-
 	XPlane* plane = new XPlane();
 	Transform* transform = dynamic_cast<Transform*>(plane->addOnlyComponent("Transform"));
 	transform->setPosition({ 0.0,-1.0f,0.0f });
-	plane->init(m_drawScreen, m_context.get(), &floor, Geometry::CreatePlane(20.0f, 20.0f, 5.0f, 5.0f));
 
-	DirectX::CreateDDSTextureFromFile(m_context->m_Device.Get(), L"D:/work/GameEngine/HLSL/brick.dds", nullptr, &textureView);
-	Texture2D brick(m_context.get(), textureView);
+	Texture2D* floor = TextureManager::instance()->getTexture(FileSystem::HLSLPath("/floor.dds"), m_context.get());
+	plane->init(m_drawScreen, m_context.get(), floor, Geometry::CreatePlane(20.0f, 20.0f, 5.0f, 5.0f));
+
+	
+	Texture2D* brick = TextureManager::instance()->getTexture(FileSystem::HLSLPath("/brick.dds"), m_context.get());
 
 	for (int i = 0; i < 4; ++i) {
 		XPlane* walls = new XPlane();
 		Transform* transform = dynamic_cast<Transform*>(walls->addOnlyComponent("Transform"));
 		transform->setRotate({ -XM_PIDIV2, XM_PIDIV2 * i, 0.0f});
 		transform->setPosition({ i % 2 ? -10.0f * (i - 2) : 0.0f, 3.0f, i % 2 == 0 ? -10.0f * (i - 1) : 0.0f });
-		walls->init(m_drawScreen, m_context.get(), &brick, Geometry::CreatePlane(20.0f, 8.0f, 5.0f, 1.5f));
+		walls->init(m_drawScreen, m_context.get(), brick, Geometry::CreatePlane(20.0f, 8.0f, 5.0f, 1.5f));
 	}
 
+	//XWoodCrateBox* box = new XWoodCrateBox();
+	//box->init(m_drawScreen, m_context.get(), m_Tranglepass->getRenderTarget());
+
 	XCarAnimation* car = new XCarAnimation();
-	car->init(m_drawScreen, m_context.get(), m_Tranglepass->getRenderTarget());
+	car->init(m_drawScreen, m_context.get());
+
+	//XBoneAnimation* bone = new XBoneAnimation();
+	//bone->init(m_drawScreen, m_context.get());
 
 	XLight* light = new XLight();
 	light->init(m_drawScreen, m_context.get());

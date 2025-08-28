@@ -35,8 +35,19 @@ struct NodeMesh {
 		}
 	};
 
+	struct TextureMesh {
+		enum class TextureType {
+			diffuse,
+			specular,
+			normal,
+			height
+		};
+		TextureType type;
+		std::string path;
+	};
+
 	std::shared_ptr<VertexBuffer<VertexAnimation>> vertexs;
-	std::shared_ptr<Texture2D> textures;
+	std::vector<TextureMesh> textures;
 	std::vector<BoneMesh> bones;
 
 	std::unordered_map<std::string, std::pair<int,Eigen::Matrix4f>> boneIndexMap;
@@ -51,11 +62,13 @@ public:
 	NodeMeshMap getNodeMesh() { return m_nodeMeshMap; }
 private:
 	NodeMeshMap m_nodeMeshMap;
-	
+	std::string m_rootPath;
+
 private:
 	void loadNode(aiNode* node, const aiScene* scene);
 	NodeMesh loadMesh(aiMesh* mesh, const aiScene* scene);
 	int loadBone(NodeMesh& pVertex, aiMesh* mesh, const aiScene* scene);
+	void loadMaterialTextures(std::vector<NodeMesh::TextureMesh>& textures, aiMaterial* mat, aiTextureType type, NodeMesh::TextureMesh::TextureType textype);
 };
 
 class MeshFilter {

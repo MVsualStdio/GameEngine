@@ -1,8 +1,9 @@
 #include "MeshFilter.h"
 #include "VertexLayout.h"
-
+#include "TextureManager.h"
 
 LoadMesh::LoadMesh(std::string path) {
+    m_rootPath = path + "/../";
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate 
         | aiProcess_GenSmoothNormals 
@@ -28,7 +29,8 @@ NodeMesh LoadMesh::loadMesh(aiMesh* mesh, const aiScene* scene) {
     //std::shared_ptr<VertexBuffer<VertexUV>> pVertex = std::make_shared<VertexUVData>();
 
     std::shared_ptr<VertexBuffer<VertexAnimation>> pVertex = std::make_shared<VertexAnimationData>();
-
+    NodeMesh res = NodeMesh();
+    res.vertexs = pVertex;
     bool hasBone = mesh->mNumBones > 0;
 
     pVertex->vertices.resize(mesh->mNumVertices);
@@ -50,7 +52,11 @@ NodeMesh LoadMesh::loadMesh(aiMesh* mesh, const aiScene* scene) {
 
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
     std::shared_ptr<Texture2D> textures;
-    NodeMesh res = NodeMesh{ pVertex , textures };
+    
+    loadMaterialTextures(res.textures, material, aiTextureType_DIFFUSE, NodeMesh::TextureMesh::TextureType::diffuse);
+    loadMaterialTextures(res.textures, material, aiTextureType_SPECULAR, NodeMesh::TextureMesh::TextureType::specular);
+    loadMaterialTextures(res.textures, material, aiTextureType_HEIGHT, NodeMesh::TextureMesh::TextureType::normal);
+    loadMaterialTextures(res.textures, material, aiTextureType_AMBIENT, NodeMesh::TextureMesh::TextureType::height);
 
     loadBone(res, mesh, scene);
     res.hasBone = hasBone;
@@ -86,6 +92,18 @@ int LoadMesh::loadBone(NodeMesh& nodeMesh, aiMesh* mesh, const aiScene* scene) {
         }
     }
     return mesh->mNumBones;
+}
+
+void LoadMesh::loadMaterialTextures(std::vector<NodeMesh::TextureMesh>& textures, aiMaterial* mat, aiTextureType type, NodeMesh::TextureMesh::TextureType textype) {
+    for (unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
+        aiString str;
+        mat->GetTexture(type, i, &str);
+        NodeMesh::TextureMesh texture;
+        texture.type = textype;
+        texture.path = m_rootPath + std::string(str.C_Str());
+        textures.push_back(texture);
+        TextureManager::instance()->addTexture(texture.path);
+    }
 }
 
 MeshFilter* MeshFilter::instance() {

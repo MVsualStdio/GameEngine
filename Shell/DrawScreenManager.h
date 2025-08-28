@@ -10,7 +10,6 @@ public:
 private:
 	void initCompent() override;
 protected:
-	void initScene();
 	void initTranglePass();
 private:
 	double m_time = 0.0;
