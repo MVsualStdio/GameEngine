@@ -56,6 +56,7 @@ set(ShellFiles
     Shell/XLight.h Shell/XLight.cpp
     Shell/XCarAnimation.h Shell/XCarAnimation.cpp
     Shell/XBoneAnimation.h Shell/XBoneAnimation.cpp
+    Shell/ShadowMap.h Shell/ShadowMap.cpp
 )
 
 set(WindowFiles

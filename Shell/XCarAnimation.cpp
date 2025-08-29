@@ -19,8 +19,12 @@ void XCarAnimation::init(IDrawer* drawer, D3D11Context* context) {
 
 	LoadMesh load(path);
 	m_nodeMesh = load.getNodeMesh();
-	m_anim = new Animation(path);
-	m_anim->update(0);
+	m_anim = dynamic_cast<Animation*>(addOnlyComponent("Animation"));;
+	m_anim->init(path);
+
+	m_transform = dynamic_cast<Transform*>(addOnlyComponent("Transform"));
+	m_light = dynamic_cast<XLightCpt*>(addOnlyComponent("XLight"));
+
 	auto AnimMat = m_anim->getAnimMat();
 
 	for (auto node : m_nodeMesh) {
@@ -28,8 +32,7 @@ void XCarAnimation::init(IDrawer* drawer, D3D11Context* context) {
 		NodeMesh mesh = node.second;
 		
 		MeshRender* render = dynamic_cast<MeshRender*>(addComponent("MeshRender"));
-		m_transform = dynamic_cast<Transform*>(addOnlyComponent("Transform"));
-		m_light = dynamic_cast<XLightCpt*>(addOnlyComponent("XLight"));
+
 
 		render->init(drawer, context);
 
@@ -70,18 +73,9 @@ void XCarAnimation::init(IDrawer* drawer, D3D11Context* context) {
 }
 
 void XCarAnimation::update(double dt) {
-	m_anim->update(dt);
 	auto AnimMat = m_anim->getAnimMat();
 	for (auto render : m_render) {
 		Eigen::Matrix4f world = AnimMat[render.first];
 		render.second->getMaterial()->getVSShader()->setUniform("g_World", world);
-
-		//for (auto node : m_nodeMesh) {
-		//	if (node.second.hasBone) {
-		//		std::vector<Eigen::Matrix4f> boneMat = m_anim->getBoneAnimMat(node.second, world);
-		//		render.second->getMaterial()->getVSShader()->setUniform("boneMatrices", boneMat);
-		//	}
-		//}
-
 	}
 }

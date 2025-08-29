@@ -4,6 +4,7 @@
 #include "../Core/DrawScreen.h"
 #include "../Core/RenderPass.h"
 
+
 class DrawMangerScreen : public DrawMangerBase {
 public:
 	DrawMangerScreen();

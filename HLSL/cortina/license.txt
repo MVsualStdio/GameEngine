@@ -1,0 +1,11 @@
+Model Information:
+* title:	Cortina Curtain New 2.0
+* source:	https://sketchfab.com/3d-models/cortina-curtain-new-20-3706dec29e3947ff8924a71a812a8cf3
+* author:	RomanSn (https://sketchfab.com/romansn)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Cortina Curtain New 2.0" (https://sketchfab.com/3d-models/cortina-curtain-new-20-3706dec29e3947ff8924a71a812a8cf3) by RomanSn (https://sketchfab.com/romansn) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

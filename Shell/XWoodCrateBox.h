@@ -9,9 +9,9 @@
 
 class XWoodCrateBox : public GameObject {
 public:
-	XWoodCrateBox();
+	XWoodCrateBox(IDrawer* draw, D3D11Context* context);
 	~XWoodCrateBox() = default;
-	void init(IDrawer* draw, D3D11Context* context, Texture2D* texture);
+	void setShaderTexture(Texture2D* texture);
 	void update(double dt) override;
 private:
 	double m_time = 0.0;

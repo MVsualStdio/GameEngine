@@ -13,12 +13,13 @@ XBoneAnimation::XBoneAnimation()
 
 void XBoneAnimation::init(IDrawer* drawer, D3D11Context* context) {
 
-	std::string path = FileSystem::HLSLPath("/vampire/dancing_vampire.dae");
+	std::string path = FileSystem::HLSLPath("/cortina/scene.gltf");
 
 	LoadMesh load(path);
 	m_nodeMesh = load.getNodeMesh();
-	m_anim = new Animation(path);
-	m_anim->update(0);
+	m_anim = dynamic_cast<Animation*>(addOnlyComponent("Animation"));;
+	m_anim->init(path);
+	
 	auto AnimMat = m_anim->getAnimMat();
 
 	for (auto node : m_nodeMesh) {

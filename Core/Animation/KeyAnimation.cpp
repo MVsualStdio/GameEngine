@@ -1,3 +1,4 @@
+#include <rttr/registration>
 #include "KeyAnimation.h"
 #include "../LoadScence.h"
 #include <iostream>
@@ -183,9 +184,22 @@ void LoadKeyAnimation::readAnimChannel(const aiAnimation* animation) {
 }
 
 
-Animation::Animation(std::string path)
-    : m_load(path) {
-    m_nodeAnimMap = m_load.getNodeAnim();
+
+RTTR_REGISTRATION
+{
+    rttr::registration::class_<Animation>("Animation")
+            .constructor<>()(rttr::policy::ctor::as_raw_ptr);
+}
+
+
+Animation::Animation(){
+    
+}
+
+void Animation::init(std::string path) {
+    m_load = std::make_shared<LoadKeyAnimation>(path);
+    m_nodeAnimMap = m_load->getNodeAnim();
+    update(0);
 }
 
 std::vector<Eigen::Matrix4f> Animation::getBoneAnimMat(NodeMesh& mesh, Eigen::Matrix4f& world) {
@@ -204,8 +218,8 @@ std::vector<Eigen::Matrix4f> Animation::getBoneAnimMat(NodeMesh& mesh, Eigen::Ma
 
 void Animation::update(double dt) {
     m_CurrentTime += dt;
-    m_CurrentTime = std::fmod(m_CurrentTime, m_load.getDuration());
-    calculateTransform(m_CurrentTime, m_load.getRootNode(), Eigen::Matrix4f::Identity());
+    m_CurrentTime = std::fmod(m_CurrentTime, m_load->getDuration());
+    calculateTransform(m_CurrentTime, m_load->getRootNode(), Eigen::Matrix4f::Identity());
 }
 
 void Animation::calculateTransform(float time, const NodeAnim* node, Eigen::Matrix4f parentTransform) {

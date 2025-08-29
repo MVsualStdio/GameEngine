@@ -7,7 +7,7 @@
 class IDrawer;
 class Camera : public Component{
 public:
-	Camera();
+	Camera(bool isComponent = true);
 	virtual ~Camera() = default;
 
 	void setProjection(Eigen::Vector3f target, float aspectRatio = 16.0f / 9.0f,

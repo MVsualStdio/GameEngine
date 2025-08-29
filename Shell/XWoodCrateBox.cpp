@@ -9,13 +9,8 @@
 #include "../Core/TextureManager.h"
 #include "../Core/FileSystem.h"
 
-XWoodCrateBox::XWoodCrateBox()
+XWoodCrateBox::XWoodCrateBox(IDrawer* drawer, D3D11Context* context)
 	: GameObject("XWoodCrateBox") {
-
-}
-
-void XWoodCrateBox::init(IDrawer* drawer, D3D11Context* context, Texture2D* texture) {
-	m_texture = texture;
 
 	m_render = dynamic_cast<MeshRender*>(addOnlyComponent("MeshRender"));
 	m_transform = dynamic_cast<Transform*>(addOnlyComponent("Transform"));
@@ -25,11 +20,11 @@ void XWoodCrateBox::init(IDrawer* drawer, D3D11Context* context, Texture2D* text
 
 	std::string texturePath = "D:/work/GameEngine/HLSL/WoodCrate.dds";
 	TextureManager::instance()->addTexture(texturePath);
-	
+
 	Material* material = new Material(context);
 	material->setVSShader(FileSystem::HLSLWPath("/woodCrateBoxLight.hlsli").data());
 	material->setPSShader(FileSystem::HLSLWPath("/woodCrateBoxLight.hlsli").data());
-	
+
 	Eigen::Matrix4f world = m_transform->getMatrix();
 
 	material->getVSShader()->setUniform("g_World", world);
@@ -40,8 +35,8 @@ void XWoodCrateBox::init(IDrawer* drawer, D3D11Context* context, Texture2D* text
 	Eigen::Vector3f color = Eigen::Vector3f{ m_light->getLightColor().x(),m_light->getLightColor().y(),m_light->getLightColor().z() };
 	material->getPSShader()->setUniform("lightColor", color);
 
-	material->getPSShader()->setTexture(0, *TextureManager::instance()->getTexture(texturePath,context));
-	material->getPSShader()->setTexture(1, *m_texture);
+	material->getPSShader()->setTexture(0, *TextureManager::instance()->getTexture(texturePath, context));
+	
 	m_render->setMaterial(std::shared_ptr<Material>(material));
 
 	m_render->setVertex(Geometry::CreateCube(2.0f, 2.0f, 2.0f));
@@ -52,7 +47,12 @@ void XWoodCrateBox::init(IDrawer* drawer, D3D11Context* context, Texture2D* text
 
 		Transform* trans = dynamic_cast<Transform*>(camera->gameObject()->getComponent("Transform"));
 		render->getMaterial()->getPSShader()->setUniform("eyePosW", trans->getPosition());
-	});
+		});
+}
+
+void XWoodCrateBox::setShaderTexture(Texture2D* texture) {
+	m_texture = texture;
+	m_render->getMaterial()->getPSShader()->setTexture(1, *texture);
 }
 
 void XWoodCrateBox::update(double dt) {

@@ -11,20 +11,23 @@ class MeshRender : public Component {
 public:
 	using CameraChangeFunction = std::function<void(MeshRender*, Camera* )>;
 	MeshRender();
+
 	void init(IDrawer* drawer, D3D11Context* context);
 
-	IDrawer* getPass() { return m_drawer; }
+	std::vector<IDrawer*> getPass() { return m_drawer; }
+	void addPass(IDrawer* drawer);
+
 	void setMaterial(std::shared_ptr<Material> material);
 	Material* getMaterial() { return m_material.get(); }
 
 	void setVertex(std::shared_ptr<AnyVertexBuffer> vertex);
 	void setVertex(std::shared_ptr<AnyVertexBuffer> vertex, int index);
 
-	void render(Camera* camera);
+	void render(Camera* camera, bool forceRender = false);
 	void cameraRender(CameraChangeFunction op);
 protected:
 	D3D11Context* m_context;
-	IDrawer* m_drawer;
+	std::vector<IDrawer*> m_drawer;
 	CameraChangeFunction m_cameraOp;
 private:
 	std::vector<std::shared_ptr<Pipeline>> m_pipelines;

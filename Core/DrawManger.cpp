@@ -50,11 +50,14 @@ void DrawMangerBase::init(HWND winID, uint32_t width, uint32_t height) {
 			if (!render) {
 				continue;
 			}
-			if (m_drawList.find(render->getPass()) == m_drawList.end()) {
-				m_drawList.emplace(render->getPass());
+			for (auto pass : render->getPass()) {
+				if (m_drawList.find(pass) == m_drawList.end()) {
+					m_drawList.emplace(pass);
+				}
+				auto drawer = m_drawList.find(pass);
+				(*drawer)->addItem(render);
 			}
-			auto drawer = m_drawList.find(render->getPass());
-			(*drawer)->addItem(render);
+			
 		}
 
 	}

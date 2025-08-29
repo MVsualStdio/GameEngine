@@ -4,10 +4,11 @@
 #include "Shell/DrawScreenManager.h"
 #include "Shell/XWoodCrateBox.h"
 #include "Core/Component/GameObject.h"
-
+#include "Core/FileSystem.h"
+#include <iostream>
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
-
+    std::cout << FileSystem::RootPath() << std::endl;
 
     DrawMangerScreen base;
     //DrawMangerTexture base;

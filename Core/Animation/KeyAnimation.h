@@ -65,14 +65,15 @@ private:
 	
 };
 
-class Animation {
+class Animation : public Component{
 public:
-	Animation(std::string path);
-	void update(double dt);
+	Animation();
+	void init(std::string path);
+	void update(double dt) override;
 	std::unordered_map<std::string, Eigen::Matrix4f> getAnimMat() { return m_nodeAnimUpdateMap; }
 	std::vector<Eigen::Matrix4f> getBoneAnimMat(NodeMesh& mesh, Eigen::Matrix4f& world);
 private:
-	LoadKeyAnimation m_load;
+	std::shared_ptr<LoadKeyAnimation> m_load;
 	std::unordered_map<std::string, NodeAnim> m_nodeAnimMap;
 	double m_CurrentTime = 0.0;
 

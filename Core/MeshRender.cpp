@@ -20,7 +20,7 @@ MeshRender::MeshRender()
 
 void MeshRender::init(IDrawer* drawer, D3D11Context* context) {
 	m_context = context;
-	m_drawer = drawer;
+	m_drawer.push_back(drawer);
 }
 
 void MeshRender::cameraRender(MeshRender::CameraChangeFunction op) {
@@ -29,13 +29,16 @@ void MeshRender::cameraRender(MeshRender::CameraChangeFunction op) {
 
 void MeshRender::initPipeline(std::vector<std::shared_ptr<AnyVertexBuffer>> vertex) {
 	size_t vertexSize = vertex.size();
-	m_pipelines.resize(vertexSize);
-	for (int i = 0; i < vertexSize;++i) {
-		m_pipelines[i] = std::make_shared<Pipeline>(m_context, m_material.get(), m_drawer, vertex[i].get());
+	m_pipelines.resize(vertexSize * m_drawer.size());
+	int k = 0;
+	for (int i = 0; i < vertexSize; ++i) {
+		for (int j = 0; j < m_drawer.size(); ++j) {
+			m_pipelines[i * vertexSize + j] = std::make_shared<Pipeline>(m_context, m_material.get(), m_drawer[j], vertex[i].get());
+		}
 	}
 }
 
-void MeshRender::render(Camera* camera) {
+void MeshRender::render(Camera* camera, bool forceRender) {
 	if (m_vertex.size() > 0) {
 		if (!m_init || m_pipelines.size() == 0) {
 			initPipeline(m_vertex);
@@ -47,9 +50,15 @@ void MeshRender::render(Camera* camera) {
 		return;
 	}
 
-	if (m_drawer == camera->getRenderPass()) {
+	bool existPass = false;
+
+	for (auto drawer : m_drawer) {
+		existPass |= drawer == camera->getRenderPass();
+	}
+	if (forceRender || existPass) {
 		m_cameraOp(this, camera);
 		for (auto& pipeline : m_pipelines) {
+			pipeline->clear();
 			pipeline->IA();
 			pipeline->VS();
 			pipeline->Rasterizer();
@@ -65,6 +74,10 @@ void MeshRender::setMaterial(std::shared_ptr<Material> material) {
 	m_material = material;
 }
 
+void MeshRender::addPass(IDrawer* drawer) {
+	m_drawer.push_back(drawer);
+	m_init = false;
+}
 
 void MeshRender::setVertex(std::shared_ptr<AnyVertexBuffer> vertex) {
 	m_vertex.push_back(vertex);

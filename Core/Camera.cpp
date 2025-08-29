@@ -15,7 +15,8 @@ std::vector<Camera*> Camera::CameraList() {
     return gAllcamera;
 }
 
-Camera::Camera() {
+Camera::Camera(bool isComponent)
+    : Component(isComponent) {
     m_viewDirty = true;
     m_y = Eigen::Vector3f(0, 1, 0);
     gAllcamera.push_back(this);

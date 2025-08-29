@@ -20,7 +20,7 @@ Pipeline::Pipeline(D3D11Context* context, Material* material, IDrawer* drawer, A
 	bufferDesc.ByteWidth = vertex->vertexCount();
 	initData.pSysMem = vertex->vertexData();
 	m_context->m_Device->CreateBuffer(&bufferDesc, &initData, pVertexBuffers.GetAddressOf());
-
+	
 	bufferDesc.ByteWidth = vertex->indexCount();
 	bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	initData.pSysMem = vertex->indexData();
@@ -36,6 +36,16 @@ Pipeline::Pipeline(D3D11Context* context, Material* material, IDrawer* drawer, A
 	sampDesc.MinLOD = 0;
 	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 	m_context->m_Device->CreateSamplerState(&sampDesc, pSampleState.GetAddressOf());
+}
+
+void Pipeline::clear() {
+	IShader::TextureBuffer textures = m_material->getPSShader()->getTexture();
+	ID3D11ShaderResourceView* nullSRVs[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT] = { nullptr };
+	ID3D11RenderTargetView* nullRTV = nullptr;
+
+	m_context->m_DeviceContext->PSSetShaderResources(0, textures.size(), nullSRVs);
+	m_context->m_DeviceContext->OMSetRenderTargets(1, &nullRTV, nullptr);
+
 }
 
 void Pipeline::IA() {

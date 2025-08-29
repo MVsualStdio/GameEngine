@@ -11,6 +11,7 @@
 #include "../Core/TextureManager.h"
 #include "../Core/FileSystem.h"
 #include "XBoneAnimation.h"
+#include "ShadowMap.h"
 
 constexpr float XM_PIDIV2 = 1.570796327f;
 
@@ -60,38 +61,45 @@ void DrawMangerScreen::initCompent() {
 
 	m_drawScreen = new DrawScreen(m_context.get());
 
-	XPlane* plane = new XPlane();
-	Transform* transform = dynamic_cast<Transform*>(plane->addOnlyComponent("Transform"));
-	transform->setPosition({ 0.0,-1.0f,0.0f });
+	//XPlane* plane = new XPlane();
+	//Transform* transform = dynamic_cast<Transform*>(plane->addOnlyComponent("Transform"));
+	//transform->setPosition({ 0.0,-1.0f,0.0f });
 
-	Texture2D* floor = TextureManager::instance()->getTexture(FileSystem::HLSLPath("/floor.dds"), m_context.get());
-	plane->init(m_drawScreen, m_context.get(), floor, Geometry::CreatePlane(20.0f, 20.0f, 5.0f, 5.0f));
+	//Texture2D* floor = TextureManager::instance()->getTexture(FileSystem::HLSLPath("/floor.dds"), m_context.get());
+	//plane->init(m_drawScreen, m_context.get(), floor, Geometry::CreatePlane(20.0f, 20.0f, 5.0f, 5.0f));
 
+	//
+	//Texture2D* brick = TextureManager::instance()->getTexture(FileSystem::HLSLPath("/brick.dds"), m_context.get());
+
+	//for (int i = 0; i < 4; ++i) {
+	//	XPlane* walls = new XPlane();
+	//	Transform* transform = dynamic_cast<Transform*>(walls->addOnlyComponent("Transform"));
+	//	transform->setRotate({ -XM_PIDIV2, XM_PIDIV2 * i, 0.0f});
+	//	transform->setPosition({ i % 2 ? -10.0f * (i - 2) : 0.0f, 3.0f, i % 2 == 0 ? -10.0f * (i - 1) : 0.0f });
+	//	walls->init(m_drawScreen, m_context.get(), brick, Geometry::CreatePlane(20.0f, 8.0f, 5.0f, 1.5f));
+	//}
+
+	XWoodCrateBox* box = new XWoodCrateBox(m_drawScreen, m_context.get());
 	
-	Texture2D* brick = TextureManager::instance()->getTexture(FileSystem::HLSLPath("/brick.dds"), m_context.get());
+	ShadowMap* shadow = new ShadowMap(m_context.get());
+	shadow->addShadowMap(box);
+	Texture2D* shadowTexture = shadow->getResult();
 
-	for (int i = 0; i < 4; ++i) {
-		XPlane* walls = new XPlane();
-		Transform* transform = dynamic_cast<Transform*>(walls->addOnlyComponent("Transform"));
-		transform->setRotate({ -XM_PIDIV2, XM_PIDIV2 * i, 0.0f});
-		transform->setPosition({ i % 2 ? -10.0f * (i - 2) : 0.0f, 3.0f, i % 2 == 0 ? -10.0f * (i - 1) : 0.0f });
-		walls->init(m_drawScreen, m_context.get(), brick, Geometry::CreatePlane(20.0f, 8.0f, 5.0f, 1.5f));
-	}
-
-	//XWoodCrateBox* box = new XWoodCrateBox();
-	//box->init(m_drawScreen, m_context.get(), m_Tranglepass->getRenderTarget());
-
-	XCarAnimation* car = new XCarAnimation();
-	car->init(m_drawScreen, m_context.get());
+	box->setShaderTexture(m_Tranglepass->getRenderTarget());
+	
+	//XCarAnimation* car = new XCarAnimation();
+	//car->init(m_drawScreen, m_context.get());
 
 	//XBoneAnimation* bone = new XBoneAnimation();
 	//bone->init(m_drawScreen, m_context.get());
 
-	XLight* light = new XLight();
-	light->init(m_drawScreen, m_context.get());
+	//XLight* light = new XLight();
+	//light->init(m_drawScreen, m_context.get());
 
 	XCameraObject* camera = new XCameraObject();
 	camera->init(m_drawScreen, m_context.get());
+
+	
 
 
 }
