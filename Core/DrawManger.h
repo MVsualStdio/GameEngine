@@ -3,7 +3,7 @@
 #include "IDrawer.h"
 #include "D3D11Context.h"
 #include <memory>
-#include <unordered_set>
+#include <set>
 
 class DrawMangerBase {
 public:
@@ -19,7 +19,19 @@ protected:
 	virtual void initCompent() {};
 
 protected:
-	std::unordered_set<IDrawer*> m_drawList;
+	struct DrawerPtrComparator {
+		bool operator()(IDrawer* a, IDrawer* b) const {
+			if (a && b) {
+				if (a->getRenderOrder() != b->getRenderOrder()) {
+					return a->getRenderOrder() < b->getRenderOrder();
+				}
+				return a < b;
+			}
+			return a < b;
+		}
+	};
+
+	std::set<IDrawer*, DrawerPtrComparator> m_drawList;
 	std::shared_ptr<D3D11Context> m_context;
 	
 };

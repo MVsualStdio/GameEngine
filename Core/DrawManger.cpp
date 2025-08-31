@@ -57,9 +57,7 @@ void DrawMangerBase::init(HWND winID, uint32_t width, uint32_t height) {
 				auto drawer = m_drawList.find(pass);
 				(*drawer)->addItem(render);
 			}
-			
 		}
-
 	}
 }
 

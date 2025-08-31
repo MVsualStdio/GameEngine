@@ -82,7 +82,7 @@ void DrawMangerScreen::initCompent() {
 	XWoodCrateBox* box = new XWoodCrateBox(m_drawScreen, m_context.get());
 	
 	ShadowMap* shadow = new ShadowMap(m_context.get());
-	shadow->addShadowMap(box);
+	shadow->addShadowMap<VertexUV>(box);
 	Texture2D* shadowTexture = shadow->getResult();
 
 	box->setShaderTexture(m_Tranglepass->getRenderTarget());

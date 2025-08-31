@@ -27,6 +27,11 @@ public:
 
 class IDrawer {
 public:
+
+	enum class PassType {
+
+	};
+
 	IDrawer(D3D11Context* context);
 	using DrawFunction = std::function<void(IDrawer* draw)>;
 
@@ -34,13 +39,19 @@ public:
 	virtual void onDraw(Camera* camera);
 	virtual void clear() = 0;
 
+	int getRenderOrder() const;
+	void setRenderOrder(int level);
+
 	void addItem(MeshRender* item);
 	virtual Texture2D* getRenderTarget() = 0;
 	virtual Depth2D* getDepthStencil() = 0;
 	std::vector<MeshRender*> getAllItems();
+
+
 protected:
 	std::vector<MeshRender*> m_items;
 	D3D11Context* m_context = nullptr;
+	int m_order;
 };
 
 class IAnim {

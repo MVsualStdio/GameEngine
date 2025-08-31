@@ -18,3 +18,11 @@ void IDrawer::onDraw(Camera* camera) {
 std::vector<MeshRender*> IDrawer::getAllItems() {
 	return m_items;
 }
+
+int IDrawer::getRenderOrder() const {
+	return m_order;
+}
+
+void IDrawer::setRenderOrder(int order) {
+	m_order = order;
+}

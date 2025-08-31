@@ -43,7 +43,7 @@ void Pipeline::clear() {
 	ID3D11ShaderResourceView* nullSRVs[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT] = { nullptr };
 	ID3D11RenderTargetView* nullRTV = nullptr;
 
-	m_context->m_DeviceContext->PSSetShaderResources(0, textures.size(), nullSRVs);
+	m_context->m_DeviceContext->PSSetShaderResources(0, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, nullSRVs);
 	m_context->m_DeviceContext->OMSetRenderTargets(1, &nullRTV, nullptr);
 
 }

@@ -29,11 +29,9 @@ void MeshRender::cameraRender(MeshRender::CameraChangeFunction op) {
 
 void MeshRender::initPipeline(std::vector<std::shared_ptr<AnyVertexBuffer>> vertex) {
 	size_t vertexSize = vertex.size();
-	m_pipelines.resize(vertexSize * m_drawer.size());
-	int k = 0;
 	for (int i = 0; i < vertexSize; ++i) {
 		for (int j = 0; j < m_drawer.size(); ++j) {
-			m_pipelines[i * vertexSize + j] = std::make_shared<Pipeline>(m_context, m_material.get(), m_drawer[j], vertex[i].get());
+			m_pipelines[m_drawer[j]] = std::make_shared<Pipeline>(m_context, m_material.get(), m_drawer[j], vertex[i].get());
 		}
 	}
 }
@@ -57,7 +55,9 @@ void MeshRender::render(Camera* camera, bool forceRender) {
 	}
 	if (forceRender || existPass) {
 		m_cameraOp(this, camera);
-		for (auto& pipeline : m_pipelines) {
+		IDrawer* pass = camera->getRenderPass();
+		if (m_pipelines.find(pass) != m_pipelines.end()) {
+			std::shared_ptr<Pipeline> pipeline = m_pipelines[pass];
 			pipeline->clear();
 			pipeline->IA();
 			pipeline->VS();
@@ -66,6 +66,7 @@ void MeshRender::render(Camera* camera, bool forceRender) {
 			pipeline->OM();
 			pipeline->DrawIndex();
 		}
+
 	}
 	
 }

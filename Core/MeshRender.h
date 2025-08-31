@@ -5,7 +5,7 @@
 #include "IDrawer.h"
 #include "Pipeline.h"
 #include "Camera.h"
-#include <unordered_set>
+#include <unordered_map>
 
 class MeshRender : public Component {
 public:
@@ -22,6 +22,7 @@ public:
 
 	void setVertex(std::shared_ptr<AnyVertexBuffer> vertex);
 	void setVertex(std::shared_ptr<AnyVertexBuffer> vertex, int index);
+	std::vector<std::shared_ptr<AnyVertexBuffer>> getVertex() { return m_vertex; }
 
 	void render(Camera* camera, bool forceRender = false);
 	void cameraRender(CameraChangeFunction op);
@@ -30,7 +31,7 @@ protected:
 	std::vector<IDrawer*> m_drawer;
 	CameraChangeFunction m_cameraOp;
 private:
-	std::vector<std::shared_ptr<Pipeline>> m_pipelines;
+	std::unordered_map<IDrawer* ,std::shared_ptr<Pipeline>> m_pipelines;
 	std::shared_ptr<Material> m_material;
 	std::vector<std::shared_ptr<AnyVertexBuffer>> m_vertex;
 	bool m_init = false;

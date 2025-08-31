@@ -9,7 +9,7 @@ RenderPass::RenderPass(D3D11Context* context)
 	: IDrawer(context)
 	, m_texture(std::make_shared<Texture2D>(m_context, m_context->width(), m_context->height())) 
 	, m_depth(std::make_shared<Depth2D>(m_context, m_context->width(), m_context->height())){
-
+	setRenderOrder(0);
 }
 
 Texture2D* RenderPass::getRenderTarget() {

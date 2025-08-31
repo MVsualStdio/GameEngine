@@ -1,8 +1,10 @@
+#include <limits>
 #include "DrawScreen.h"
+
 
  DrawScreen::DrawScreen(D3D11Context* context) 
 	:IDrawer(context){
-
+	 setRenderOrder(INT_MAX);
 }
 
 Texture2D* DrawScreen::getRenderTarget() {
