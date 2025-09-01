@@ -18,8 +18,8 @@ struct VertexOut
 VertexOut VS(VertexIn vIn)
 {
     VertexOut vOut;
-    vOut.posW = mul(float4(vIn.pos,1.0), g_World);
-    vOut.posH = mul(vOut.posW, g_View);
+    vOut.posH = mul(float4(vIn.pos,1.0), g_World);
+    vOut.posH = mul(vOut.posH, g_View);
     vOut.posH = mul(vOut.posH, g_Proj);
     return vOut;
 }

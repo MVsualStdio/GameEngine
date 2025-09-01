@@ -46,3 +46,11 @@ void XPlane::init(IDrawer* drawer, D3D11Context* context, Texture2D* texture, st
 		render->getMaterial()->getPSShader()->setUniform("eyePosW", trans->getPosition());
 	});
 }
+
+void XPlane::setShaderTexture(Camera* camera, Texture2D* texture) {
+	m_render->getMaterial()->getPSShader()->setTexture(1, *texture);
+
+	Eigen::Matrix4f lightMat = camera->view() * camera->projection();
+	m_render->getMaterial()->getVSShader()->setUniform("g_Light", lightMat);
+
+}

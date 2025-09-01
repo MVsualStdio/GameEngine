@@ -20,6 +20,8 @@ public:
 	Texture2D* getResult();
 	~ShadowMap();
 
+	Camera* getCamera() { return m_camera; }
+
 private:
 	XLightCpt* m_light;
 	Transform* m_transform;

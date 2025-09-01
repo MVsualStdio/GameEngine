@@ -9,7 +9,7 @@
 #include "../Core/TextureManager.h"
 #include "../Core/FileSystem.h"
 
-XWoodCrateBox::XWoodCrateBox(IDrawer* drawer, D3D11Context* context)
+XWoodCrateBox::XWoodCrateBox(IDrawer* drawer, D3D11Context* context, Texture2D* texture)
 	: GameObject("XWoodCrateBox") {
 
 	m_render = dynamic_cast<MeshRender*>(addOnlyComponent("MeshRender"));
@@ -36,7 +36,8 @@ XWoodCrateBox::XWoodCrateBox(IDrawer* drawer, D3D11Context* context)
 	material->getPSShader()->setUniform("lightColor", color);
 
 	material->getPSShader()->setTexture(0, *TextureManager::instance()->getTexture(texturePath, context));
-	
+	material->getPSShader()->setTexture(1, *texture);
+
 	m_render->setMaterial(std::shared_ptr<Material>(material));
 
 	m_render->setVertex(Geometry::CreateCube(2.0f, 2.0f, 2.0f));
@@ -50,10 +51,6 @@ XWoodCrateBox::XWoodCrateBox(IDrawer* drawer, D3D11Context* context)
 		});
 }
 
-void XWoodCrateBox::setShaderTexture(Texture2D* texture) {
-	m_texture = texture;
-	m_render->getMaterial()->getPSShader()->setTexture(1, *texture);
-}
 
 void XWoodCrateBox::update(double dt) {
 	//float RotationSpeed = 1.0f / 1000.0f;

@@ -9,6 +9,8 @@ public:
 	XPlane();
 	~XPlane();
 	void init(IDrawer* draw, D3D11Context* context, Texture2D* texture, std::shared_ptr<AnyVertexBuffer> vertex);
+	void setShaderTexture(Camera* camera, Texture2D* texture);
+
 private:
 	Transform* m_transform;
 	MeshRender* m_render;
