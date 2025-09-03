@@ -112,7 +112,7 @@ void TextureManager::loading(D3D11Context* context) {
         if (isDDS(getFileExtension(cache))) {
             DirectX::CreateDDSTextureFromFile(context->m_Device.Get(), wideString.c_str(), nullptr, &textureView);
         }
-        else if (isPNG(getFileExtension(cache))) {
+        else if (isPNG(getFileExtension(cache)) || isJPN(getFileExtension(cache))) {
             textureView = TextureLoader::LoadTextureFromPNG(context->m_Device.Get(), wideString);
         }
 
@@ -143,4 +143,8 @@ bool TextureManager::isDDS(std::string& suffix) {
 
 bool TextureManager::isPNG(std::string& suffix) {
     return suffix == "PNG" || suffix == "png";
+}
+
+bool TextureManager::isJPN(std::string& suffix) {
+    return suffix == "JPG" || suffix == "jpg";
 }

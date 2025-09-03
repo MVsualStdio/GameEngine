@@ -88,3 +88,8 @@ void MeshRender::setVertex(std::shared_ptr<AnyVertexBuffer> vertex, int index) {
 	m_vertex[index] = vertex;
 	m_init = false;
 }
+
+void MeshRender::resetVertex() {
+	m_vertex.clear();
+	m_init = false;
+}

@@ -56,7 +56,7 @@ private:
 		void operator()(const Eigen::Vector3f& val) { cbv.SetFloatMatrix(1, 3, val.data()); }
 		void operator()(const std::vector<Eigen::Matrix4f>& val) { cbv.SetValue(val.data(), val.size() * sizeof(Eigen::Matrix4f)); }
 		void operator()(int value) {  }
-		void operator()(float value) {  }
+		void operator()(float value) { cbv.SetValue(&value, sizeof(float)); }
 		void operator()(uint32_t value) {  }
 		ConstantBufferVariable& cbv;
 	};

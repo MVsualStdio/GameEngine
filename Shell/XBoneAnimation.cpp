@@ -13,15 +13,16 @@ XBoneAnimation::XBoneAnimation()
 
 void XBoneAnimation::init(IDrawer* drawer, D3D11Context* context) {
 
-	std::string path = FileSystem::HLSLPath("/cortina/scene.gltf");
-
+	//std::string path = FileSystem::HLSLPath("/cortina/scene.gltf");
+	std::string path = FileSystem::HLSLPath("/curtainset/scene.gltf");
+	//std::string path = FileSystem::HLSLPath("/vampire/dancing_vampire.dae");
+	//std::string path = FileSystem::HLSLPath("/car/scene.gltf");
 	LoadMesh load(path);
 	m_nodeMesh = load.getNodeMesh();
 	m_anim = dynamic_cast<Animation*>(addOnlyComponent("Animation"));;
-	m_anim->init(path);
-	
+	m_success = m_anim->init(path);
 	auto AnimMat = m_anim->getAnimMat();
-
+	
 	for (auto node : m_nodeMesh) {
 
 		NodeMesh mesh = node.second;
@@ -36,8 +37,11 @@ void XBoneAnimation::init(IDrawer* drawer, D3D11Context* context) {
 		material->setVSShader(FileSystem::HLSLWPath("/BoneAnimation.hlsli").data());
 		material->setPSShader(FileSystem::HLSLWPath("/BoneAnimation.hlsli").data());
 
-		Eigen::Matrix4f world = AnimMat[node.first];
-
+		Eigen::Matrix4f world = Eigen::Matrix4f::Identity();
+		if (m_success) {
+			Eigen::Matrix4f world = AnimMat[node.first];
+		}
+		
 		material->getVSShader()->setUniform("g_World", world);
 		Eigen::Matrix4f worldInv = world.inverse().transpose();
 		material->getVSShader()->setUniform("g_WorldInvTranspose", worldInv);
@@ -51,6 +55,12 @@ void XBoneAnimation::init(IDrawer* drawer, D3D11Context* context) {
 			material->getPSShader()->setTexture(i, *texture);
 		}
 
+		if (mesh.textures.size() == 0) {
+			std::string texturePath = "D:/work/GameEngine/HLSL/WoodCrate.dds";
+			TextureManager::instance()->addTexture(texturePath);
+			Texture2D* texture = TextureManager::instance()->getTexture(texturePath, context);
+			material->getPSShader()->setTexture(0, *texture);
+		}
 
 		render->setMaterial(std::shared_ptr<Material>(material));
 
@@ -70,18 +80,9 @@ void XBoneAnimation::init(IDrawer* drawer, D3D11Context* context) {
 }
 
 void XBoneAnimation::update(double dt) {
-	m_anim->update(dt);
-	auto AnimMat = m_anim->getAnimMat();
-	for (auto render : m_render) {
-		Eigen::Matrix4f world = AnimMat[render.first];
-		render.second->getMaterial()->getVSShader()->setUniform("g_World", world);
 
-		for (auto node : m_nodeMesh) {
-			if (node.second.hasBone) {
-				std::vector<Eigen::Matrix4f> boneMat = m_anim->getBoneAnimMat(node.second, world);
-				render.second->getMaterial()->getVSShader()->setUniform("boneMatrices", boneMat);
-			}
-		}
-
+	if (m_success) {
+		m_anim->updateHelper(m_render, m_nodeMesh);
 	}
+
 }

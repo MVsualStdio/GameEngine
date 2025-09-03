@@ -22,6 +22,8 @@ public:
 
 	void setVertex(std::shared_ptr<AnyVertexBuffer> vertex);
 	void setVertex(std::shared_ptr<AnyVertexBuffer> vertex, int index);
+	void resetVertex();
+
 	std::vector<std::shared_ptr<AnyVertexBuffer>> getVertex() { return m_vertex; }
 
 	void render(Camera* camera, bool forceRender = false);

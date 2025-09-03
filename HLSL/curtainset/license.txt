@@ -1,0 +1,11 @@
+Model Information:
+* title:	CurtainSet - Animated
+* source:	https://sketchfab.com/3d-models/curtainset-animated-7a98759bc6fa427d8d0d29f668f9eb1a
+* author:	DjArun (https://sketchfab.com/djarun)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "CurtainSet - Animated" (https://sketchfab.com/3d-models/curtainset-animated-7a98759bc6fa427d8d0d29f668f9eb1a) by DjArun (https://sketchfab.com/djarun) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

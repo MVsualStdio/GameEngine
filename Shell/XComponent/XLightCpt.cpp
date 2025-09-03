@@ -12,7 +12,7 @@ RTTR_REGISTRATION
 XLightCpt::XLightCpt(bool isComponent)
 	: Component(isComponent)
 	, m_lightColor(Eigen::Vector4f{ 1.0f,1.0f,1.0f,1.0f })
-	, m_position(Eigen::Vector3f{ 30.0f,30.0f,-40.0f })
+	, m_position(Eigen::Vector3f{ 30.0f,30.0f,40.0f })
 	, m_lookAt(Eigen::Vector3f{ 0.0f,0.0f,0.0f }) {
 
 }

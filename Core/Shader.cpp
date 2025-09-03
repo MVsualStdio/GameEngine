@@ -20,7 +20,10 @@ IShader::IShader(D3D11Context* context, LPCWSTR filename, LPCSTR entry, LPCSTR e
 
 void IShader::setUniform(std::string name, Property value) {
 	size_t svNameID = StringToID(name);
-	m_ConstantBufferVariables[svNameID]->Set(value);
+	if (m_ConstantBufferVariables.find(svNameID) != m_ConstantBufferVariables.end()) {
+		m_ConstantBufferVariables[svNameID]->Set(value);
+	}
+	
 }
 
 void IShader::setTexture(size_t slot, Texture2D value) {

@@ -8,6 +8,15 @@ public:
 	std::vector<Vertex> vertices;
 	std::vector<uint32_t> indices;
 
+	//VertexBuffer(const VertexBuffer& other)
+	//	: vertices(other.vertices) 
+	//	, indices(other.indices)     
+	//{}
+
+	//VertexBuffer clone() const {
+	//	return VertexBuffer(*this); // 调用拷贝构造函数
+	//}
+
 	const Vertex* vertexData() const { return vertices.data(); }
 	const size_t vertexSize() const { return sizeof(Vertex); }
 	const size_t vertexCount() const { return vertices.size() * sizeof(Vertex); }

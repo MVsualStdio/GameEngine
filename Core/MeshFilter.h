@@ -46,12 +46,22 @@ struct NodeMesh {
 		std::string path;
 	};
 
+	struct FrameMesh {
+		float weight = 0.0f;
+		std::vector<Eigen::Vector3f> pos;
+		std::vector<Eigen::Vector3f> normal;
+	};
+
+	std::string name;
 	std::shared_ptr<VertexBuffer<VertexAnimation>> vertexs;
+
+	std::vector<FrameMesh> meshAnims;
 	std::vector<TextureMesh> textures;
 	std::vector<BoneMesh> bones;
 
 	std::unordered_map<std::string, std::pair<int,Eigen::Matrix4f>> boneIndexMap;
 	bool hasBone = false;
+	bool hasMorph = false;
 };
 
 class LoadMesh {
@@ -69,6 +79,9 @@ private:
 	NodeMesh loadMesh(aiMesh* mesh, const aiScene* scene);
 	int loadBone(NodeMesh& pVertex, aiMesh* mesh, const aiScene* scene);
 	void loadMaterialTextures(std::vector<NodeMesh::TextureMesh>& textures, aiMaterial* mat, aiTextureType type, NodeMesh::TextureMesh::TextureType textype);
+
+	void loadMeshMorph(NodeMesh& pVertex, aiMesh* mesh, const aiScene* scene);
+
 };
 
 class MeshFilter {

@@ -21,4 +21,5 @@ private:
 	XLightCpt* m_light;
 	Animation* m_anim;
 	std::unordered_map<std::string, NodeMesh> m_nodeMesh;
+	bool m_success;
 };

@@ -13,8 +13,6 @@ XCarAnimation::XCarAnimation()
 
 void XCarAnimation::init(IDrawer* drawer, D3D11Context* context) {
 
-	//std::string path = "C:/Users/41795/Downloads/cortina_curtain_new_2.0/scene.gltf";
-	
 	std::string path = FileSystem::HLSLPath("/car/scene.gltf");
 
 	LoadMesh load(path);

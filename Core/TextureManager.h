@@ -22,4 +22,5 @@ private:
 
 	bool isDDS(std::string& suffix);
 	bool isPNG(std::string& suffix);
+	bool isJPN(std::string& suffix);
 };

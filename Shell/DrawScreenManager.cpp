@@ -78,18 +78,15 @@ void DrawMangerScreen::initCompent() {
 		walls->init(m_drawScreen, m_context.get(), brick, Geometry::CreatePlane(20.0f, 8.0f, 5.0f, 1.5f));
 	}
 
-	XWoodCrateBox* box = new XWoodCrateBox(m_drawScreen, m_context.get(), m_Tranglepass->getRenderTarget());
+	//XWoodCrateBox* box = new XWoodCrateBox(m_drawScreen, m_context.get(), m_Tranglepass->getRenderTarget());
 	
 	ShadowMap* shadow = new ShadowMap(m_context.get());
-	shadow->addShadowMap<VertexUV>(box);
-	shadow->addShadowMap<VertexUV>(plane);
 
-	plane->setShaderTexture(shadow->getCamera(), shadow->getResult());
 	//XCarAnimation* car = new XCarAnimation();
 	//car->init(m_drawScreen, m_context.get());
 
-	//XBoneAnimation* bone = new XBoneAnimation();
-	//bone->init(m_drawScreen, m_context.get());
+	XBoneAnimation* bone = new XBoneAnimation();
+	bone->init(m_drawScreen, m_context.get());
 
 	XLight* light = new XLight();
 	light->init(m_drawScreen, m_context.get());
@@ -97,7 +94,10 @@ void DrawMangerScreen::initCompent() {
 	XCameraObject* camera = new XCameraObject();
 	camera->init(m_drawScreen, m_context.get());
 
-	
+	shadow->addShadowMap<VertexAnimation>(bone);
+	shadow->addShadowMap<VertexUV>(plane);
+
+	plane->setShaderTexture(shadow->getCamera(), shadow->getResult());
 
 
 }

@@ -48,7 +48,7 @@ XWoodCrateBox::XWoodCrateBox(IDrawer* drawer, D3D11Context* context, Texture2D* 
 
 		Transform* trans = dynamic_cast<Transform*>(camera->gameObject()->getComponent("Transform"));
 		render->getMaterial()->getPSShader()->setUniform("eyePosW", trans->getPosition());
-		});
+	});
 }
 
 

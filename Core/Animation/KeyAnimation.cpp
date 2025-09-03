@@ -2,7 +2,7 @@
 #include "KeyAnimation.h"
 #include "../LoadScence.h"
 #include <iostream>
-
+#include "../MeshRender.h"
 KeyAnimationClip::KeyAnimationClip()
     : m_transform(false) {
 
@@ -131,14 +131,60 @@ void KeyAnimationClip::interpolatePosition(float animationTime) {
     m_transform.setPosition(position);
 }
 
+void MeshFrameAnimationClip::init(const aiMeshMorphAnim* channel){
+    for (unsigned int j = 0; j < channel->mNumKeys; j++) {
+        aiMeshMorphKey& key = channel->mKeys[j];
+
+        MorphKey morphKey;
+        morphKey.time = key.mTime;
+
+        for (unsigned int k = 0; k < key.mNumValuesAndWeights; k++) {
+            morphKey.targetIndices.push_back(key.mValues[k]);
+            morphKey.weights.push_back(key.mWeights[k]);
+        }
+        m_keys.push_back(morphKey);
+    }
+    std::sort(m_keys.begin(), m_keys.end(),
+        [](const MorphKey& a, const MorphKey& b) {
+            return a.time < b.time;
+    });
+}
+
+MeshFrameAnimationClip::MorphKey MeshFrameAnimationClip::update(float animationTime) {
+    size_t nextKeyIndex = 0;
+    if (m_keys.size() <= 0) {
+        return MorphKey{};
+    }
+
+    for (; nextKeyIndex < m_keys.size(); nextKeyIndex++) {
+        if (m_keys[nextKeyIndex].time > animationTime) {
+            break;
+        }
+    }
+    if (nextKeyIndex == 0) {
+        m_currentKey = 0;
+    }
+    else if (nextKeyIndex >= m_keys.size()) {
+        m_currentKey = m_keys.size() - 1;
+    }
+    else {
+        m_currentKey = nextKeyIndex - 1;
+    }
+
+    m_keys[m_currentKey].frameIndex = m_currentKey;
+    return m_keys[m_currentKey];
+}
+
 LoadKeyAnimation::LoadKeyAnimation(std::string path) {
     const aiScene* scene = LoadScene::importer()->ReadFile(path, LoadScene::loadFlag());
-    int num = scene->mNumAnimations;
-    m_animation = scene->mAnimations[0];
-    m_duration = m_animation->mDuration;
-    m_ticksPerSecond = m_animation->mTicksPerSecond != 0 ? m_animation->mTicksPerSecond : 25.0f;
-    readAnimNodes(m_rootNode, scene->mRootNode);
-    readAnimChannel(m_animation);
+    m_animNumber = scene->mNumAnimations;
+    if (scene->mNumAnimations > 0) {
+        m_animation = scene->mAnimations[0];
+        m_duration = m_animation->mDuration;
+        m_ticksPerSecond = m_animation->mTicksPerSecond != 0 ? m_animation->mTicksPerSecond : 25.0f;
+        readAnimNodes(m_rootNode, scene->mRootNode);
+        readAnimChannel(m_animation);
+    }
 }
 
 std::unordered_map<std::string, NodeAnim> LoadKeyAnimation::getNodeAnim() {
@@ -169,6 +215,9 @@ void LoadKeyAnimation::readAnimNodes(NodeAnim& dest, aiNode* src) {
 }
 
 void LoadKeyAnimation::readAnimChannel(const aiAnimation* animation) {
+    std::cout << "Number of mesh channels: " << m_animation->mNumMeshChannels << std::endl;
+    std::cout << "Number of Morph channels: " << m_animation->mNumMorphMeshChannels << std::endl;
+   
     for (int i = 0; i < animation->mNumChannels; i++) {
         const aiNodeAnim* channel = animation->mChannels[i];
         
@@ -179,8 +228,22 @@ void LoadKeyAnimation::readAnimChannel(const aiAnimation* animation) {
             m_nodeAnimMap[channelName].activate = true;
             m_nodeAnimMap[channelName].animClip.init(channel);
         }
-
     }
+
+    for (int i = 0; i < animation->mNumMorphMeshChannels; i++) {
+        const aiMeshMorphAnim* channel = animation->mMorphMeshChannels[i];
+
+        std::string channelName = channel->mName.data;
+
+        std::cout << channelName << std::endl;
+
+        if (m_nodeAnimMap.find(channelName) != m_nodeAnimMap.end()) {
+            m_nodeAnimMap[channelName].activate = true;
+            m_nodeAnimMap[channelName].frameClip.init(channel);
+        }
+        
+    }
+
 }
 
 
@@ -196,10 +259,13 @@ Animation::Animation(){
     
 }
 
-void Animation::init(std::string path) {
+bool Animation::init(std::string path) {
     m_load = std::make_shared<LoadKeyAnimation>(path);
-    m_nodeAnimMap = m_load->getNodeAnim();
-    update(0);
+    if (m_load->isSucessful()) {
+        m_nodeAnimMap = m_load->getNodeAnim();
+        update(0);
+    }
+    return m_load->isSucessful();
 }
 
 std::vector<Eigen::Matrix4f> Animation::getBoneAnimMat(NodeMesh& mesh, Eigen::Matrix4f& world) {
@@ -216,6 +282,14 @@ std::vector<Eigen::Matrix4f> Animation::getBoneAnimMat(NodeMesh& mesh, Eigen::Ma
     return std::vector<Eigen::Matrix4f>();
 }
 
+MeshFrameAnimationClip::MorphKey Animation::getFrameAnim(NodeMesh& mesh) {
+    if (mesh.hasMorph) {
+        MeshFrameAnimationClip::MorphKey key = m_nodeAnimMap[mesh.name].frameClip.getKey();
+        return key;
+    }       
+    return  MeshFrameAnimationClip::MorphKey{};
+}
+
 void Animation::update(double dt) {
     m_CurrentTime += dt;
     m_CurrentTime = std::fmod(m_CurrentTime, m_load->getDuration());
@@ -224,13 +298,15 @@ void Animation::update(double dt) {
 
 void Animation::calculateTransform(float time, const NodeAnim* node, Eigen::Matrix4f parentTransform) {
     std::string nodeName = node->name;
-    NodeAnim animNode = m_nodeAnimMap[nodeName];
+    NodeAnim& animNode = m_nodeAnimMap[nodeName];
 
     Eigen::Matrix4f nodeTransform = node->transformation;
 
     if (m_nodeAnimMap.find(nodeName) != m_nodeAnimMap.end() && animNode.activate) {
         Transform transform = animNode.animClip.update(time);
         nodeTransform = transform.getMatrix();
+
+        MeshFrameAnimationClip::MorphKey key = animNode.frameClip.update(time);
     }
 
     Eigen::Matrix4f globalTransformation = nodeTransform * parentTransform;
@@ -238,5 +314,48 @@ void Animation::calculateTransform(float time, const NodeAnim* node, Eigen::Matr
 
     for (int i = 0; i < animNode.children.size(); i++) {
         calculateTransform(time, &node->children[i], globalTransformation);
+    }
+}
+
+
+void Animation::updateHelper(std::unordered_map<std::string, MeshRender*>& renders, std::unordered_map<std::string, NodeMesh> nodeMeshs) {
+    auto AnimMat = this->getAnimMat();
+
+    for (auto render : renders) {
+        Eigen::Matrix4f world = AnimMat[render.first];
+        render.second->getMaterial()->getVSShader()->setUniform("g_World", world);
+        int mi = 0;
+
+        NodeMesh& mesh = nodeMeshs[render.first];
+
+        if (mesh.hasBone) {
+            std::vector<Eigen::Matrix4f> boneMat = this->getBoneAnimMat(mesh, world);
+            render.second->getMaterial()->getVSShader()->setUniform("boneMatrices", boneMat);
+        }
+
+        if (mesh.hasMorph) {
+            std::shared_ptr<VertexBuffer<VertexAnimation>> pVertexs = mesh.vertexs;
+            MeshFrameAnimationClip::MorphKey key = this->getFrameAnim(mesh);
+            for (int i = 0; i < key.targetIndices.size(); ++i) {
+                float widget = key.weights[i];
+                unsigned int targetIndex = key.targetIndices[i];
+                NodeMesh::FrameMesh& targets = mesh.meshAnims[targetIndex];
+                targets.weight = widget;
+            }
+
+            for (size_t j = 0; j < mesh.meshAnims.size(); j++) {
+                NodeMesh::FrameMesh& targets = mesh.meshAnims[j];
+                if (targets.weight > 0.0f) {
+                    for (int k = 0; k < pVertexs->vertices.size(); ++k) {
+                        pVertexs->vertices[k].pos += (targets.pos[k] - pVertexs->vertices[k].pos) * targets.weight;
+                        if (targets.normal.size() > 0) {
+                            pVertexs->vertices[k].normal += (targets.normal[k] - pVertexs->vertices[k].normal) * targets.weight;
+                        }
+                    }
+                }
+            }
+            render.second->resetVertex();
+            render.second->setVertex(std::make_shared<AnyVertexBuffer>(nodeMeshs[render.first].vertexs));
+        }
     }
 }

@@ -27,11 +27,15 @@ void LoadMesh::loadNode(aiNode* node, const aiScene* scene) {
 
 NodeMesh LoadMesh::loadMesh(aiMesh* mesh, const aiScene* scene) {
     //std::shared_ptr<VertexBuffer<VertexUV>> pVertex = std::make_shared<VertexUVData>();
-
     std::shared_ptr<VertexBuffer<VertexAnimation>> pVertex = std::make_shared<VertexAnimationData>();
     NodeMesh res = NodeMesh();
+    res.name = mesh->mName.data;
     res.vertexs = pVertex;
+   
     bool hasBone = mesh->mNumBones > 0;
+    res.hasBone = hasBone;
+    bool hasMorph = mesh->mNumAnimMeshes > 0;
+    res.hasMorph = hasMorph;
 
     pVertex->vertices.resize(mesh->mNumVertices);
     for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
@@ -58,15 +62,19 @@ NodeMesh LoadMesh::loadMesh(aiMesh* mesh, const aiScene* scene) {
     loadMaterialTextures(res.textures, material, aiTextureType_HEIGHT, NodeMesh::TextureMesh::TextureType::normal);
     loadMaterialTextures(res.textures, material, aiTextureType_AMBIENT, NodeMesh::TextureMesh::TextureType::height);
 
-    loadBone(res, mesh, scene);
-    res.hasBone = hasBone;
-
     if (hasBone) {
+        loadBone(res, mesh, scene);
         for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
             pVertex->vertices[i].boneIndex = { res.bones[i].indexs[0], 0, 0, 0 };
             pVertex->vertices[i].widget = { res.bones[i].weights[0], 0.0, 0.0, 0.0 };
         }
     }
+
+    if (hasMorph) {
+        loadMeshMorph(res, mesh, scene);
+    }
+   
+
     return res;
 }
 
@@ -106,7 +114,23 @@ void LoadMesh::loadMaterialTextures(std::vector<NodeMesh::TextureMesh>& textures
     }
 }
 
+void LoadMesh::loadMeshMorph(NodeMesh& pVertex, aiMesh* mesh, const aiScene* scene) {
+    pVertex.meshAnims.resize(mesh->mNumAnimMeshes);
+    for (unsigned int i = 0; i < mesh->mNumAnimMeshes; i++) {
+        aiAnimMesh* animMesh = mesh->mAnimMeshes[i];
+        pVertex.meshAnims[i].pos.resize(animMesh->mNumVertices);
+        pVertex.meshAnims[i].normal.resize(animMesh->mNumVertices);
+        for (unsigned int k = 0; k < animMesh->mNumVertices; k++) {
+            pVertex.meshAnims[i].pos[k] = Eigen::Vector3f(animMesh->mVertices[k].x, animMesh->mVertices[k].y, animMesh->mVertices[k].z);
+            if (animMesh->HasNormals()) {
+                pVertex.meshAnims[i].normal[k] = Eigen::Vector3f(animMesh->mNormals[k].x, animMesh->mNormals[k].y, animMesh->mNormals[k].z);
+            }
+        }
+    }
+}
+
 MeshFilter* MeshFilter::instance() {
     static MeshFilter gMeshFilter;
     return &gMeshFilter;
 }
+
