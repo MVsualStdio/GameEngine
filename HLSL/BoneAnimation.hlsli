@@ -1,6 +1,5 @@
 Texture2D g_Tex : register(t0);
 SamplerState g_SamLinear : register(s0);
-Texture2D g_Tex2 : register(t1);
 
 struct VertexIn
 {

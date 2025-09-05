@@ -7,15 +7,18 @@
 #include "CBuffer.h"
 #include "IDrawer.h"
 #include "Shader.h"
+#include "EffectType.h"
+
 
 class Material {
 public:
+
 	Material(D3D11Context* context);
 	~Material();
 	void addTexture(std::string name, Texture2D texture);
 	Texture2D getTexture(std::string name);
-	void setVSShader(LPCWSTR filename, LPCSTR entry = "VS");
-	void setPSShader(LPCWSTR filename, LPCSTR entry = "PS");
+	void setVSShader(LPCWSTR filename, EffectType type = EffectType::None, LPCSTR entry = "VS");
+	void setPSShader(LPCWSTR filename, EffectType type = EffectType::None, LPCSTR entry = "PS");
 	std::shared_ptr<VSShader> getVSShader();
 	std::shared_ptr<PSShader> getPSShader();
 

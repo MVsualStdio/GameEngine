@@ -46,6 +46,7 @@ void Pipeline::clear() {
 	m_context->m_DeviceContext->PSSetShaderResources(0, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, nullSRVs);
 	m_context->m_DeviceContext->OMSetRenderTargets(1, &nullRTV, nullptr);
 
+
 }
 
 void Pipeline::IA() {

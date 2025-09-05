@@ -11,7 +11,6 @@ class MeshRender : public Component {
 public:
 	using CameraChangeFunction = std::function<void(MeshRender*, Camera* )>;
 	MeshRender();
-
 	void init(IDrawer* drawer, D3D11Context* context);
 
 	std::vector<IDrawer*> getPass() { return m_drawer; }

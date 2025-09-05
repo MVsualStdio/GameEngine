@@ -35,8 +35,8 @@ XWoodCrateBox::XWoodCrateBox(IDrawer* drawer, D3D11Context* context, Texture2D* 
 	Eigen::Vector3f color = Eigen::Vector3f{ m_light->getLightColor().x(),m_light->getLightColor().y(),m_light->getLightColor().z() };
 	material->getPSShader()->setUniform("lightColor", color);
 
-	material->getPSShader()->setTexture(0, *TextureManager::instance()->getTexture(texturePath, context));
-	material->getPSShader()->setTexture(1, *texture);
+	material->getPSShader()->setTexture(0, TextureManager::instance()->getTexture(texturePath, context));
+	material->getPSShader()->setTexture(1, texture);
 
 	m_render->setMaterial(std::shared_ptr<Material>(material));
 

@@ -25,7 +25,6 @@ void RenderPass::present() {
 }
 
 void RenderPass::clear() {
-	m_context->resetRT();
 	m_context->ClearRT(m_texture->GetRenderTarget().Get());
 	m_context->ClearDepth(m_depth->GetDepthStencil().Get());
 }

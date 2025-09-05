@@ -13,8 +13,8 @@ XBoneAnimation::XBoneAnimation()
 
 void XBoneAnimation::init(IDrawer* drawer, D3D11Context* context) {
 
-	//std::string path = FileSystem::HLSLPath("/cortina/scene.gltf");
-	std::string path = FileSystem::HLSLPath("/curtainset/scene.gltf");
+	std::string path = FileSystem::HLSLPath("/cortina/scene.gltf");
+	//std::string path = FileSystem::HLSLPath("/curtainset/scene.gltf");
 	//std::string path = FileSystem::HLSLPath("/vampire/dancing_vampire.dae");
 	//std::string path = FileSystem::HLSLPath("/car/scene.gltf");
 	LoadMesh load(path);
@@ -52,14 +52,14 @@ void XBoneAnimation::init(IDrawer* drawer, D3D11Context* context) {
 
 		for (int i = 0; i < mesh.textures.size(); ++i) {
 			Texture2D* texture = TextureManager::instance()->getTexture(mesh.textures[i].path, context);
-			material->getPSShader()->setTexture(i, *texture);
+			material->getPSShader()->setTexture(i, texture);
 		}
 
 		if (mesh.textures.size() == 0) {
 			std::string texturePath = "D:/work/GameEngine/HLSL/WoodCrate.dds";
 			TextureManager::instance()->addTexture(texturePath);
 			Texture2D* texture = TextureManager::instance()->getTexture(texturePath, context);
-			material->getPSShader()->setTexture(0, *texture);
+			material->getPSShader()->setTexture(0, texture);
 		}
 
 		render->setMaterial(std::shared_ptr<Material>(material));

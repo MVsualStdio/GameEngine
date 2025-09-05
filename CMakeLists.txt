@@ -39,6 +39,7 @@ set(CoreFiles
     Core/Animation/KeyAnimation.h  Core/Animation/KeyAnimation.cpp
     Core/TextureManager.h Core/TextureManager.cpp
     Core/FileSystem.h Core/FileSystem.cpp
+    Core/EffectType.h
 )
 
 set(ComponentFiles

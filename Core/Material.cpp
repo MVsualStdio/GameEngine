@@ -27,13 +27,13 @@ Texture2D Material::getTexture(std::string name) {
 	}
 }
 
-void Material::setVSShader(LPCWSTR filename, LPCSTR entry) {
-	m_VS = std::make_shared<VSShader>(m_context, filename,entry);
+void Material::setVSShader(LPCWSTR filename, EffectType type, LPCSTR entry) {
+	m_VS = std::make_shared<VSShader>(m_context, filename, entry, type);
 	
 }
 
-void Material::setPSShader(LPCWSTR filename, LPCSTR entry) {
-	m_PS = std::make_shared<PSShader>(m_context, filename, entry);
+void Material::setPSShader(LPCWSTR filename, EffectType type, LPCSTR entry) {
+	m_PS = std::make_shared<PSShader>(m_context, filename, entry, type);
 }
 
 std::shared_ptr<VSShader> Material::getVSShader() {

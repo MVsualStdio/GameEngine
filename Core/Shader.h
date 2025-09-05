@@ -4,6 +4,7 @@
 #include "IDrawer.h"
 #include "CBuffer.h"
 #include <d3dcompiler.h>
+#include "EffectType.h"
 
 class IShader {
 public:
@@ -12,13 +13,14 @@ public:
 	using TextureBuffer = std::unordered_map<uint32_t, ShaderResource>;
 	using SampleBuffer = std::unordered_map<uint32_t, SamplerState>;
 public:
-	IShader(D3D11Context* context, LPCWSTR filename, LPCSTR entry, LPCSTR entryTarget);
+	IShader(D3D11Context* context, LPCWSTR filename, LPCSTR entry, LPCSTR entryTarget, EffectType type);
 	void setUniform(std::string name, Property value);
-	void setTexture(size_t slot, Texture2D value);
+	void setTexture(size_t slot, Texture2DBase* value);
 	CBuffers getUniform();
 	TextureBuffer getTexture();
 	SampleBuffer getSample();
 	ID3DBlob* getBlob();
+	void setEffectType(EffectType type);
 protected:
 	HRESULT shaderReflection(ID3DBlob* blob, CBuffers& ConstantBuffers, CBufferVariables& ConstantBufferVariables, TextureBuffer& TextureBuffer, SampleBuffer& SampleBuffer);
 protected:
@@ -28,11 +30,14 @@ protected:
 	ComPtr<ID3DBlob> m_blob;
 	TextureBuffer m_TextureBuffer;
 	SampleBuffer m_SampleBuffer;
+	std::wstring m_filename;
+	std::string m_entry;
+	std::string m_entryTarget;
 };
 
 class VSShader : public IShader {
 public:
-	VSShader(D3D11Context* m_context, LPCWSTR filename, LPCSTR entry);
+	VSShader(D3D11Context* m_context, LPCWSTR filename, LPCSTR entry, EffectType type);
 	ComPtr<ID3D11VertexShader> getVS() { return m_VS; }
 private:
 	ComPtr<ID3D11VertexShader> m_VS;
@@ -40,7 +45,7 @@ private:
 
 class PSShader : public IShader {
 public:
-	PSShader(D3D11Context* m_context, LPCWSTR filename, LPCSTR entry);
+	PSShader(D3D11Context* m_context, LPCWSTR filename, LPCSTR entry, EffectType type);
 	ComPtr<ID3D11PixelShader> getPS() { return m_PS; }
 private:
 	ComPtr<ID3D11PixelShader> m_PS;

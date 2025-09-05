@@ -1,11 +1,27 @@
 #include "Shader.h"
 #include <iostream>
 
-IShader::IShader(D3D11Context* context, LPCWSTR filename, LPCSTR entry, LPCSTR entryTarget)
-	: m_context(context) {
+IShader::IShader(D3D11Context* context, LPCWSTR filename, LPCSTR entry, LPCSTR entryTarget, EffectType type)
+	: m_context(context)
+	, m_filename(filename)
+	, m_entry(entry)
+	, m_entryTarget(entryTarget) {
+	setEffectType(type);
+}
+
+void IShader::setEffectType(EffectType type) {
+	m_blob = nullptr;
 	ID3DBlob* ppErrorMsgs = nullptr;
 
-	auto hr = D3DCompileFromFile(filename, 0, D3D_COMPILE_STANDARD_FILE_INCLUDE, entry, entryTarget, D3D10_SHADER_ENABLE_STRICTNESS, 0, m_blob.GetAddressOf(), &ppErrorMsgs);
+	std::vector<D3D_SHADER_MACRO> defines;
+
+	if (HasEffect(type, EffectType::ShadowMap)) {
+		defines.push_back({ "SHADOW_PASS", "" });
+	}
+
+	defines.push_back({ nullptr, nullptr });
+
+	auto hr = D3DCompileFromFile(m_filename.data(), defines.data(), D3D_COMPILE_STANDARD_FILE_INCLUDE, m_entry.data(), m_entryTarget.data(), D3D10_SHADER_ENABLE_STRICTNESS, 0, m_blob.GetAddressOf(), &ppErrorMsgs);
 
 	if (FAILED(hr))
 	{
@@ -14,9 +30,7 @@ IShader::IShader(D3D11Context* context, LPCWSTR filename, LPCSTR entry, LPCSTR e
 			std::cout << reinterpret_cast<const char*>(ppErrorMsgs->GetBufferPointer()) << std::endl;;
 		}
 	}
-
 }
-
 
 void IShader::setUniform(std::string name, Property value) {
 	size_t svNameID = StringToID(name);
@@ -26,8 +40,8 @@ void IShader::setUniform(std::string name, Property value) {
 	
 }
 
-void IShader::setTexture(size_t slot, Texture2D value) {
-	m_TextureBuffer[slot].pSRV = value.GetShaderResource();
+void IShader::setTexture(size_t slot, Texture2DBase* value) {
+	m_TextureBuffer[slot].pSRV = value->GetShaderResource();
 }
 
 IShader::CBuffers IShader::getUniform() {
@@ -117,14 +131,20 @@ HRESULT IShader::shaderReflection(ID3DBlob* blob, CBuffers& ConstantBuffers, CBu
 	}
 }
 
-VSShader::VSShader(D3D11Context* m_context, LPCWSTR filename, LPCSTR entry)
-	: IShader(m_context, filename, entry, "vs_5_0") {
+VSShader::VSShader(D3D11Context* m_context, LPCWSTR filename, LPCSTR entry, EffectType type)
+	: IShader(m_context, filename, entry, "vs_5_0", type) {
 	HRESULT hr = m_context->m_Device->CreateVertexShader(m_blob->GetBufferPointer(), m_blob->GetBufferSize(), NULL, m_VS.GetAddressOf());
 	shaderReflection(m_blob.Get(), m_CBuffers, m_ConstantBufferVariables, m_TextureBuffer, m_SampleBuffer);
 }
 
-PSShader::PSShader(D3D11Context* m_context, LPCWSTR filename, LPCSTR entry)
-	: IShader(m_context, filename, entry, "ps_5_0") {
+PSShader::PSShader(D3D11Context* m_context, LPCWSTR filename, LPCSTR entry, EffectType type)
+	: IShader(m_context, filename, entry, "ps_5_0", type) {
+
+	D3D_SHADER_MACRO defines[] = {
+	   { "USE_NORMAL_MAP", "" },
+	   { "USE_SSAO_MAP", "" },
+	   { nullptr, nullptr}
+	};
 	HRESULT hr = m_context->m_Device->CreatePixelShader(m_blob->GetBufferPointer(), m_blob->GetBufferSize(), NULL, m_PS.GetAddressOf());
 	shaderReflection(m_blob.Get(), m_CBuffers, m_ConstantBufferVariables, m_TextureBuffer, m_SampleBuffer);
 }

@@ -13,7 +13,7 @@ XPlane::~XPlane() {
 
 }
 
-void XPlane::init(IDrawer* drawer, D3D11Context* context, Texture2D* texture, std::shared_ptr<AnyVertexBuffer> vertex) {
+void XPlane::init(IDrawer* drawer, D3D11Context* context, Texture2D* texture, std::shared_ptr<AnyVertexBuffer> vertex, EffectType type) {
 	m_render = dynamic_cast<MeshRender*>(addOnlyComponent("MeshRender"));
 	m_transform = dynamic_cast<Transform*>(addOnlyComponent("Transform"));
 	m_light = dynamic_cast<XLightCpt*>(addOnlyComponent("XLight"));
@@ -24,7 +24,7 @@ void XPlane::init(IDrawer* drawer, D3D11Context* context, Texture2D* texture, st
 
 	Material* material = new Material(context);
 	material->setVSShader(L"D:/work/GameEngine/HLSL/floor.hlsli");
-	material->setPSShader(L"D:/work/GameEngine/HLSL/floor.hlsli");
+	material->setPSShader(L"D:/work/GameEngine/HLSL/floor.hlsli", type);
 	
 	material->getVSShader()->setUniform("g_World", world);
 	Eigen::Matrix4f worldInv = world.inverse().transpose();
@@ -34,7 +34,7 @@ void XPlane::init(IDrawer* drawer, D3D11Context* context, Texture2D* texture, st
 	Eigen::Vector3f color = Eigen::Vector3f{ m_light->getLightColor().x(),m_light->getLightColor().y(),m_light->getLightColor().z() };
 	material->getPSShader()->setUniform("lightColor", color);
 
-	material->getPSShader()->setTexture(0, *texture);
+	material->getPSShader()->setTexture(0, texture);
 	m_render->setMaterial(std::shared_ptr<Material>(material));
 	m_render->setVertex(vertex);
 
@@ -47,8 +47,9 @@ void XPlane::init(IDrawer* drawer, D3D11Context* context, Texture2D* texture, st
 	});
 }
 
-void XPlane::setShaderTexture(Camera* camera, Texture2D* texture) {
-	m_render->getMaterial()->getPSShader()->setTexture(1, *texture);
+void XPlane::setShaderTexture(Camera* camera, Texture2DBase* texture) {
+
+	m_render->getMaterial()->getPSShader()->setTexture(1, texture);
 
 	Eigen::Matrix4f lightMat = camera->view() * camera->projection();
 	m_render->getMaterial()->getVSShader()->setUniform("g_Light", lightMat);

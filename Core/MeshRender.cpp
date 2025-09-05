@@ -18,6 +18,7 @@ MeshRender::MeshRender()
 	};
 }
 
+
 void MeshRender::init(IDrawer* drawer, D3D11Context* context) {
 	m_context = context;
 	m_drawer.push_back(drawer);
@@ -66,9 +67,7 @@ void MeshRender::render(Camera* camera, bool forceRender) {
 			pipeline->OM();
 			pipeline->DrawIndex();
 		}
-
 	}
-	
 }
 
 void MeshRender::setMaterial(std::shared_ptr<Material> material) {
@@ -76,6 +75,11 @@ void MeshRender::setMaterial(std::shared_ptr<Material> material) {
 }
 
 void MeshRender::addPass(IDrawer* drawer) {
+	for (auto d : m_drawer) {
+		if (d == drawer) {
+			return;
+		}
+	}
 	m_drawer.push_back(drawer);
 	m_init = false;
 }

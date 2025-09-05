@@ -20,7 +20,6 @@ void DrawScreen::present() {
 }
 
 void DrawScreen::clear() {
-	m_context->resetRT();
 	m_context->ClearScreenRT();
 	m_context->ClearScreenDepth();
 }

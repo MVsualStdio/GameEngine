@@ -50,7 +50,7 @@ void XCarAnimation::init(IDrawer* drawer, D3D11Context* context) {
 
 		for (int i = 0; i < mesh.textures.size(); ++i) {
 			Texture2D* texture = TextureManager::instance()->getTexture(mesh.textures[i].path, context);
-			material->getPSShader()->setTexture(i, *texture);
+			material->getPSShader()->setTexture(i, texture);
 		}
 		
 		render->setMaterial(std::shared_ptr<Material>(material));

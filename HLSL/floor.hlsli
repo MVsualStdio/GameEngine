@@ -1,5 +1,4 @@
 Texture2D g_Tex : register(t0);
-Texture2D g_TexShadow : register(t1);
 SamplerState g_SamLinear : register(s0);
 
 struct VertexIn
@@ -40,7 +39,6 @@ cbuffer PointLightBuffer : register(b1)
     float3 pad;
 };
 
-
 VertexOut VS(VertexIn vIn)
 {
     VertexOut vOut;
@@ -61,9 +59,14 @@ VertexOut VS(VertexIn vIn)
     return vOut;
 }
 
+#if defined SHADOW_PASS
+Texture2D g_TexShadow : register(t1);
+#endif
 
 float ShadowCalculation(float4 lightPosH)
 {
+    float res = 0.0;
+#if defined SHADOW_PASS
     float4 shadowPos = lightPosH / lightPosH.w;
     shadowPos.x = (shadowPos.x + 1) * 0.5;
     shadowPos.y = (-shadowPos.y + 1) * 0.5;
@@ -74,7 +77,6 @@ float ShadowCalculation(float4 lightPosH)
     g_TexShadow.GetDimensions(textureWidth, textureHeight);
     float2 texSize = float2(1.0 / textureWidth,1.0/textureHeight);
 
-    float res = 0.0;
     for(int x = -1; x <= 1; ++x) {
         for(int y = -1; y <= 1; ++y) {
             float pcfDepth = g_TexShadow.Sample(g_SamLinear, shadowPos.xy + float2(x,y) * texSize).r;
@@ -84,18 +86,17 @@ float ShadowCalculation(float4 lightPosH)
             
         }
     }
-
     if(shadowPos.z > 1.0){
         res = 0.0;
     }
-        
+#endif
     return res / 9.0;
 }
+
 
 float4 PS(VertexOut pIn) : SV_TARGET
 {
     float4 abedo = g_Tex.Sample(g_SamLinear, pIn.tex);
-   // float4 abedo = texColor1;
 
     float ambientStrength = 0.3f;
     float3 ambient = ambientStrength * lightColor;
@@ -110,8 +111,6 @@ float4 PS(VertexOut pIn) : SV_TARGET
     float3 reflectDir = reflect(-lightDir, norm);  
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
     float3 specular = specularStrength * spec * lightColor;  
-
-    //float3 color = (ambient + diffuse + specular) * abedo.xyz;
 
     float shadow = ShadowCalculation(pIn.lightPosH);
 

@@ -46,6 +46,22 @@ NodeMesh LoadMesh::loadMesh(aiMesh* mesh, const aiScene* scene) {
         if (mesh->mTextureCoords[0]) {
             pVertex->vertices[i].uv = { mesh->mTextureCoords[0][i].x , mesh->mTextureCoords[0][i].y };
         }
+        if (mesh->HasVertexColors(0)) {
+            aiColor4D* color = mesh->mColors[0]; // 获取第一个颜色集的指针
+            if (color) {
+                // RGBA格式，值范围通常是0.0-1.0
+                pVertex->vertices[i].color = {
+                    color[i].r,
+                    color[i].g,
+                    color[i].b,
+                    color[i].a
+                };
+            }
+        }
+        else {
+            // 设置默认颜色（白色）
+            pVertex->vertices[i].color = { 1.0f, 1.0f, 1.0f, 1.0f };
+        }
     }
 
     for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {

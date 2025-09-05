@@ -41,7 +41,7 @@ void DrawMangerScreen::initTranglePass() {
 	ID3D11ShaderResourceView* textureView;
 	DirectX::CreateDDSTextureFromFile(m_context->m_Device.Get(), L"D:/work/GameEngine/HLSL/flare.dds", nullptr, &textureView);
 	Texture2D textureDDS(m_context.get(), textureView);
-	material->getPSShader()->setTexture(0, textureDDS);
+	material->getPSShader()->setTexture(0, &textureDDS);
 
 	trangle->setMaterial(std::shared_ptr<Material>(material));
 	Eigen::Vector3f points[3] = { { 0.0f, 0.5f, 0.5f },{ 0.5f, -0.5f, 0.5f },{ -0.5f, -0.5f, 0.5f } };
@@ -66,22 +66,22 @@ void DrawMangerScreen::initCompent() {
 	transform->setPosition({ 0.0,-1.0f,0.0f });
 
 	Texture2D* floor = TextureManager::instance()->getTexture(FileSystem::HLSLPath("/floor.dds"), m_context.get());
-	plane->init(m_drawScreen, m_context.get(), floor, Geometry::CreatePlane(20.0f, 20.0f, 5.0f, 5.0f));
+	plane->init(m_drawScreen, m_context.get(), floor, Geometry::CreatePlane(20.0f, 20.0f, 5.0f, 5.0f), EffectType::ShadowMap);
 
 	Texture2D* brick = TextureManager::instance()->getTexture(FileSystem::HLSLPath("/brick.dds"), m_context.get());
 
-	for (int i = 0; i < 4; ++i) {
-		XPlane* walls = new XPlane();
-		Transform* transform = dynamic_cast<Transform*>(walls->addOnlyComponent("Transform"));
-		transform->setRotate({ -XM_PIDIV2, XM_PIDIV2 * i, 0.0f});
-		transform->setPosition({ i % 2 ? -10.0f * (i - 2) : 0.0f, 3.0f, i % 2 == 0 ? -10.0f * (i - 1) : 0.0f });
-		walls->init(m_drawScreen, m_context.get(), brick, Geometry::CreatePlane(20.0f, 8.0f, 5.0f, 1.5f));
-	}
+	ShadowMap* shadow = new ShadowMap(m_context.get());
+
+	//for (int i = 0; i < 4; ++i) {
+	//	XPlane* walls = new XPlane();
+	//	Transform* transform = dynamic_cast<Transform*>(walls->addOnlyComponent("Transform"));
+	//	transform->setRotate({ -XM_PIDIV2, XM_PIDIV2 * i, 0.0f});
+	//	transform->setPosition({ i % 2 ? -10.0f * (i - 2) : 0.0f, 3.0f, i % 2 == 0 ? -10.0f * (i - 1) : 0.0f });
+	//	walls->init(m_drawScreen, m_context.get(), brick, Geometry::CreatePlane(20.0f, 8.0f, 5.0f, 1.5f));
+	//}
 
 	//XWoodCrateBox* box = new XWoodCrateBox(m_drawScreen, m_context.get(), m_Tranglepass->getRenderTarget());
 	
-	ShadowMap* shadow = new ShadowMap(m_context.get());
-
 	//XCarAnimation* car = new XCarAnimation();
 	//car->init(m_drawScreen, m_context.get());
 
@@ -94,10 +94,12 @@ void DrawMangerScreen::initCompent() {
 	XCameraObject* camera = new XCameraObject();
 	camera->init(m_drawScreen, m_context.get());
 
-	shadow->addShadowMap<VertexAnimation>(bone);
-	shadow->addShadowMap<VertexUV>(plane);
+	shadow->addShadowMap(bone);
 
-	plane->setShaderTexture(shadow->getCamera(), shadow->getResult());
+	XPlane* planeShadow = new XPlane();
+	planeShadow->init(shadow->getPass(), m_context.get(), floor, Geometry::CreatePlane(20.0f, 20.0f, 5.0f, 5.0f), EffectType::None);
+	shadow->addShadowMap(planeShadow);
 
 
+	plane->setShaderTexture(shadow->getCamera(), shadow->getDepth());
 }

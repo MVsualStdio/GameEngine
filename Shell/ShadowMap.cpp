@@ -15,10 +15,25 @@ ShadowMap::ShadowMap(D3D11Context* context)
 	m_camera->setRenderPass(m_pass);
 }
 
+void ShadowMap::addShadowMap(GameObject* meshRender) {
+	std::vector<Component*> renders = meshRender->getComponents("MeshRender");
+	for (auto component : renders) {
+		MeshRender* render = dynamic_cast<MeshRender*>(component);
+		if (render) {
+			render->getMaterial()->getPSShader()->setEffectType(EffectType::None);
+			render->addPass(m_pass);
+		}
+	}
+}
 
 Texture2D* ShadowMap::getResult() {
 	return m_pass->getRenderTarget();
 }
+
+Depth2D* ShadowMap::getDepth() {
+	return m_pass->getDepthStencil();
+}
+
 
 ShadowMap::~ShadowMap() {
 
